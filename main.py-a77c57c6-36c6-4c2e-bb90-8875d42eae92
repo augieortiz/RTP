@@ -1,0 +1,221 @@
+import sys, os
+import web
+import json
+import sys
+from bs4 import BeautifulSoup
+import requests
+from pymongo import MongoClient
+import pymongo
+from pymongo import TEXT
+import string
+from collections import Counter
+import operator
+import re
+import lxml.etree
+import hashlib
+
+
+urls = (
+       '/', 'index',
+       	'/receive', 'receive',
+		'/add', 'add',
+        '/thesis', 'thesis',
+        '/login', 'login',
+        '/logout', 'Kill'
+)
+web.config.debug = False
+
+app = web.application(urls, globals())
+application = app.wsgifunc()
+curdir = os.path.dirname(__file__)
+db = web.database(dbn='mysql', user='root', pw='Augie03!', db='dbRTP')
+
+
+store = web.session.DBStore(db, 'sessions')
+session = web.session.Session(app, store, initializer={'login': 0,'privilege': 0,'user':'anonymous'})
+
+class index:
+    def GET(self):
+            root = os.path.dirname(__file__) 
+            render = web.template.render("templates/")
+            if logged():
+                return render.index("True", session.user)
+            else:
+                return render.login("False", "")
+class thesis:
+    def GET(self):
+            render = web.template.render("templates/")
+            if logged():
+                return render.thesis("True", session.user)
+            else:
+                return render.login("alert", "This data is sensitive and therefore you must have credentials to view the thesis document.")
+class login:
+    def GET(self):
+         if logged():
+            render = web.template.render("templates/")
+            return render.index("already logged in")
+         else:
+            render = web.template.render("templates/")
+            return render.login("", "")
+
+    def POST(self):
+        name, passwd = web.input().email, web.input().password
+        try:
+            ident = db.select('Users', where='email=$name', vars=locals())[0]
+        except IndexError:
+            render = web.template.render("templates/")
+            return render.login("error", "This is not an account with us. Please contact the admin to recieve an account.")
+        else:
+            try:
+                if passwd == ident['pass']:
+                    session.login = 1
+                    session.privilege = ident['privilege']
+                    session.user = ident['user']
+                    render = web.template.render("templates/")
+                    return render.index('True', session.user)
+                else:
+                    render = web.template.render("templates/")
+                    return render.login("error", "You have entered an invalid password. Try again.")
+            except Exception, e:
+                render = web.template.render("templates/")
+                return render.login("error", "Error on server" + "\n" + str(e))
+class Kill:
+    def GET(self):
+        # Remove session data
+        # And redirect the user to the main page
+        session.kill()
+        render = web.template.render("templates/")
+        return  render.login("False", "")
+class receive:
+    def GET(self):
+            render = web.template.render("templates/")
+            if logged():
+    			return render.receive("http://osu.edu", "http://osu.edu", "success", "True", session.user)
+            else:
+                return render.login("warning", "You must login before you receive data.")
+    def POST(self):
+            convo = web.input()
+            db = connectToDatabase()
+            db.RTP.create_index([('title', TEXT), ('document', TEXT)], default_language='english')
+            search = convo['conversation']
+            keywords = watsonProcess(search)
+            data = []
+            data, index = searchDatbaseRake(db, keywords)
+            render = web.template.render('templates/') 
+            present = data[0]
+            try: 
+                if not data[0]:
+                    return render.receive(data, "http://augie.devao.me", "error")
+                else:
+                    return render.receive("We found the presentation data of:  " + present[0], present[0], "success", "True", session.user)
+            except Exception,e:
+                return render.receive(str(e), "", "True", session.user)
+class add:
+    def GET(self):
+            render = web.template.render("templates/")
+            if logged():
+			    return render.add("", "", 'True', session.user)
+            else:
+                return render.login("warning", "You must login before you add data.")
+    def POST(self):
+        try:
+           #Database connections
+            client = MongoClient()
+            db = client.RTP
+
+            url = web.input()
+            page = requests.get(url['url'])
+            soup = BeautifulSoup(page.text, 'html.parser')
+            t = soup.find('title')
+            [s.extract() for s in soup(['style', 'script', '[document]', 'head', 'title'])]
+            visible_text = soup.getText()
+            visible_text = visible_text.encode("utf-8")
+            visible_text = os.linesep.join([s for s in visible_text.splitlines() if s])
+            address = url['url']
+            title = t.text
+            document  = visible_text
+
+            #INSERT DATAPOINT
+            query = db.RTP.insert_one( { "url": address, "title" : title, "document" : document })
+            render = web.template.render('templates/') 
+            return render.add("Success.  The site: " + title + " has been added into the database.", "success", "True", session.user)
+        except Exception,e: 
+            render = web.template.render("templates/")
+            return render.add("Failure.  The site has not been added into the database.", "error", "success", "True", session.user)
+def connectToDatabase():
+    print "Establishing connection to database.."
+    try:
+        client = MongoClient()
+        db = client.RTP
+        collection = db.RTP
+        print(collection)
+    except RuntimeError:
+        "Connection failed to database. Exiting Application..."
+        exit(0)
+    print "Success! Connected to WikiFootball Mongo database"
+    return db
+def watsonProcess(search):
+    print "Starting Rake parsing process on tweets..."
+    rakeData = []
+    count_all = Counter()
+    phrases = txtRake(search)
+    for term, score in phrases:
+            rakeData.append(term)
+
+    count_all.update(rakeData)
+    print "Tweets were parsed of special characters, and concatenated for mining."
+    return count_all
+
+def searchDatbaseRake(db, keywords):
+    searchData = []
+    searchData.append([])
+    searchData.append([])
+    searchData.append([])
+    keywords = keywords.most_common(25)
+    print "Starting search through wikiFootball..."
+    print "Searching for top result..."
+    for x in range (0,len(keywords)):
+        try:
+            result = db.RTP.aggregate( [ { "$match": { "$text": { "$search": keywords[x][0] } } },  { "$project": { "url": -1, "_id": 0, "score": { "$meta": "textScore" } } }, { "$match": { "score": {  "$gt": 1 } } } ]) 
+        except RuntimeError:
+            print "Search has failed with keywords : " + keywords[x][0] + ". Retrying with next keyword."
+        for document in result:
+            searchData[0].append(str(document['url']))
+            searchData[1].append(document['score'])
+            searchData[2].append(keywords[x][0])
+    if not searchData[0]:
+        print "No results found..."
+        return searchData, 0
+    else:
+        try:
+            #Find index of MAX score
+            maxScore = 0;
+            maxIndex = 0;
+            for index in range(0,len(searchData[1])):
+                if searchData[1][index] > maxScore:
+                    maxScore = searchData[1][index]
+                    maxIndex = index
+            
+        except IndexError:
+            searchData = []
+            "Error on results. Retry."
+    return searchData, maxIndex
+
+def logged():
+    if session.get('login', 1):
+        return True
+    else:
+        return False
+def notfound():
+    render = web.template.render("templates/")
+    return web.notfound(render.notfound("This is not the page you're looking for..."));
+def internalerror():
+    return web.internalerror(render.notfound("My bad...you can blame me on this one."));
+
+app.internalerror = internalerror
+
+    # You can use template result like below, either is ok:
+    #return web.notfound(render.notfound())
+    #return web.notfound(str(render.notfound()))
+
+app.notfound = notfound

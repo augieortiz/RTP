@@ -1,0 +1,78 @@
+$def with (message, url, status, logged, user)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>DevAO - RTP Add Data</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="static/bootstrap.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+  <link rel="stylesheet" href="static/font-awesome.css">
+  <link rel='shortcut icon' href='static/favicon.ico'>
+</head>
+<body>
+<nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span> 
+                </button>
+                    <a class="navbar-brand" href="/"><span style="font-size: 75%">research</span>DevAO</a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav navbar-collapse">
+                        <li class=""><a href="/add">Add Data</a></li>
+                        <li class="active"><a href="/receive">Receive Data</a></li>
+                        <li><a href="/thesis">Thesis</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        $if logged == 'True':
+                            <li><a href="#">Welcome, <strong>$user</strong></a></li>
+                            <li><a href="/logout">Log Out</a></li>
+                        $if logged == 'False':
+                            <li><a href="/login">Login</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+  <div class="container">
+     <h3>Receive Presentation Data</h3>
+      <p>Enter any text, conversation, or transcript.  The MongoDB will be searched and queried to locate the most relevant presentation data.</p> 
+		<form method="post" name="convoForm" onsubmit=" return validateForm()" action="receive">
+		<input type="textarea" class="form-control" rows="5" name="conversation" /> 
+		<br>
+		<input disabled type="submit" value="Find Presentation Data" />
+		</form>
+    <p style="color: red;">This feild is currently under development and has been disabled.</p>
+		<br>
+		$if status == 'success':
+			<div class="alert alert-success" role="alert">
+	  			<a href="#" class="alert-link">$message has been chosen as the presentation data.</a>
+			</div>
+		$else:
+			<div class="alert alert-danger" role="alert">
+	  			<a href="#" class="alert-link">$message</a>
+			</div>
+  </div>
+  <iframe src=$url style="height: 400px; width: 100%;"> </iframe>
+</body>
+</html>
+<script>
+function validateForm()
+{
+
+  	var conversation = document.forms["convoForm"]["conversation"].value;
+	if (conversation == '' )
+   	{
+   		alert("You have not entered anything!");
+     	return false;
+   	} 
+   	else {
+     	return true;
+   }
+}
+ </script>

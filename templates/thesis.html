@@ -1,0 +1,81 @@
+$def with (logged, user)
+<html lang="en">
+    <head>
+        <title>DevAO - Research Home</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="static/bootstrap.css" type="text/css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+    </head>
+    <body>
+       <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span> 
+                </button>
+                    <a class="navbar-brand" href="/"><span style="font-size: 75%">research</span>DevAO</a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav navbar-collapse">
+                        <li><a href="/add">Add Data</a></li>
+                        <li><a href="/receive">Receive Data</a></li>
+                        <li class="active"><a href="/thesis">Thesis</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        $if logged == 'True':
+                            <li><a href="#">Welcome, <strong>$user</strong></a></li>
+                            <li><a href="/logout">Log Out</a></li>
+                        $if logged == 'False':
+                            <li><a href="/login">Login</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="page-header">
+                <h1>Thesis<small> Running document and thought process for all thesis work.</small></h1>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">Problem statement</div>
+                <div class="panel-body">
+                    <blockquote>Can there be a process or tool for any software application to properly store document or presentation data so it could later be retrieved based on surrounding topics and discussion?  In other words, is it possible to inject relevant and useful information to the end user based on the surrounding discussion or topic?  </blockquote>
+                    <p>A presenter often has multiple sources of information relevant to their presentation.  The data is usually laid out in a static ordered design.  Presenters, tend to promote discussion throughout a presentation.  In particular, the discussion can lead to problems when the talking points deviate from the intended ordered design of the presentation.  The audience can potentially focus their attention on irrelevant presentation data.  A software tool can change and modify the presentation data to the relevant discussed topic could potentially solve this issue and add to the audience members overall learning experience. </p>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">Related Work</div>
+                <div class="panel-body">
+                    <p>Neelam Soundarajan, Swaroop Joshi and Rajiv Ramnath. &ldquo;<a href="http://ieeexplore.ieee.org.proxy.lib.ohio-state.edu/xpl/articleDetails.jsp?arnumber=7202981&amp;newsearch=true&amp;queryText=Collaborative%20and%20Cooperative-Learning%20in%20Software%20Engineering%20Courses">Collaborative and Cooperative-Learning in Software Engineering Courses.</a>&rdquo; <em>2015 Volume 2</em>.</p>
+                    <p>Jelinek, Frederick. <a href="http://ieeexplore.ieee.org/xpl/login.jsp?tp=&amp;arnumber=1457611&amp;url=http%3A%2F%2Fieeexplore.ieee.org%2Fiel5%2F5%2F31355%2F01457611.pdf%3Farnumber%3D1457611"><em>The Development of an Experimental Discrete Dictation Recognizer.</em></a> Proceedings of the IEEE, Vol. 73(11) (November 1985): pp. 1616-1624.</p>
+                    <p>Kastrati, Fisnik, Xiang Li, Christoph Quix, and Mohammadreza Khelghati. "<a href="http://ieeexplore.ieee.org/xpl/login.jsp?tp=&amp;arnumber=1457611&amp;url=http%3A%2F%2Fieeexplore.ieee.org%2Fiel5%2F5%2F31355%2F01457611.pdf%3Farnumber%3D1457611">Enabling Structured Queries over Unstructured Documents</a>." <em>2011 IEEE 12th International Conference on Mobile Data </em><em>Management</em>(2011).</p>
+                    <p>Jain, Alpa, AnHai Doan, and Luis Gravano. "<a href="http://www.cs.columbia.edu/~alpa/Papers/icde07.pdf">SQL and Relational Databases</a>."<em>Automated Data Collection with R A Practical Guide to Web Scraping and Text Mining</em>(2014): 164-95</p>                
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">Repetitive Searching over Active Conversation</div>
+                <div class="panel-body">
+                    <p style="color:red;">*This Validation piece is based on a active presentation.  After the pivot to document injection, this needs revised and modified.</p>
+                        <p>The validation will hold true if the results produced by the active queries, based on a timing parameter, are relevant to the data collected a time <em>t</em>. If the time is broken down, it can be shown at which moments in time can be validated with the results:</p>
+                        <p>Let <em>t</em> be real time seconds, <em>d</em> be keywords/phrases in which to use as a parameter for queries, <em>r </em>be results from query, and <em>P</em> be presentation data from database.</p>
+                        <p>The query is executed on the data model at <em>t<sub>1</sub></em> using <em>d<sub>0</sub> </em>as it&rsquo;s parameter condition. <em>d<sub>0 </sub></em>is created using the mining method on the text data gathered at the times <em>t<sub>0 &rarr;</sub> t<sub>1</sub></em>. The results of <em>r<sub>1</sub> </em>will be produced at the end of the <em>t<sub>0 &rarr;</sub> t<sub>1 </sub></em>at time <em>t<sub>1</sub></em>. Then <em>r<sub>1 </sub></em>must be validated.</p>
+                        <p>The validation of <em>r<sub>1 </sub></em>will start by evaluating the count of the query. This process will finish at time <em>t<sub>1L</sub></em>.<em> </em>The tuple count will determine which path to route the system.</p>
+                        <p>If count(<em>r<sub>1</sub></em>) = 0, meaning <em>d<sub>0</sub></em> was insufficient in carrying relevant results in comparison to the provided P, the system will simply do nothing. By trusting our mining method and assuming the conversation text is accurate, the system will avoid displaying potentially irrelevant presentation data. The system will move on, and use <em>d<sub>1</sub> </em>which is a result from times <em>t<sub>1 &rarr;</sub> t<sub>2 </sub></em>and execute a new query.</p>
+                        <p>If count(<em>r<sub>1</sub></em>) = 1, the result is used as the selection.</p>
+                        <p>If count(<em>r<sub>1</sub></em>) &gt; 1, there will need to be a selection process. This could involve setting priority on some fields and using an order by to grab the top result. The selection process can be interchangeable as long as we narrow to a single result.</p>
+                        <p>Once results are validated and a selection is made, <em>P<sub>1</sub></em> is displayed. There will be a delay in time before <em>P<sub>1</sub></em> is displayed due to the validation of <em>r<sub>1.</sub> </em>This time is marked at <em>t<sub>1L</sub> </em>which is significant to note because it falls on the <em>t<sub>1&rarr;</sub> t<sub>2 </sub></em>timeline. This will cause each time segment to have its own thread. A new thread will be created at the start of each <em>t </em>interval.</p>
+                        <p>After repeated iterations of the above process, we will need to use the count(<em>r</em>) to validate the results. We can use the basic methods precision and recall to quantify how the query selection is performing. Recall gives a useable result because we can use the query tuples returned over the total pieces of presentation data available.</p>
+                        <p>Recall = (count(<em>r</em>) / total <em>d</em>))</p>
+                        <p>*Precision (selected r) / count(<em>r</em>))</p>
+                        <p>*Selection will always be equal 1/count(<em>r</em>)</p>
+                        <p>How can precision be relied on if the relevant records is always one?</p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
