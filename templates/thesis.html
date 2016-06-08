@@ -9,6 +9,7 @@ $def with (logged, user)
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        <link href="static/favicon.ico" rel="icon" type="image/x-icon" />
     </head>
     <body>
        <nav class="navbar navbar-inverse">
@@ -44,8 +45,13 @@ $def with (logged, user)
             <div class="panel panel-primary">
                 <div class="panel-heading">Problem statement</div>
                 <div class="panel-body">
-                    <blockquote>Can there be a process or tool for any software application to properly store document or presentation data so it could later be retrieved based on surrounding topics and discussion?  In other words, is it possible to inject relevant and useful information to the end user based on the surrounding discussion or topic?  </blockquote>
-                    <p>A presenter often has multiple sources of information relevant to their presentation.  The data is usually laid out in a static ordered design.  Presenters, tend to promote discussion throughout a presentation.  In particular, the discussion can lead to problems when the talking points deviate from the intended ordered design of the presentation.  The audience can potentially focus their attention on irrelevant presentation data.  A software tool can change and modify the presentation data to the relevant discussed topic could potentially solve this issue and add to the audience members overall learning experience. </p>
+                    <blockquote>Is there a process to keep the natural flow of discussion continuous while also providing useful & relevant data based on the discussion context?</blockquote>
+                    <p>Live conversations are fluid and natural.  A conversation makes agreements, takes unpredictable turns, and could even come to arguments.  Assume a user engaged in a live conversation often needs information to validate a point or argument.  Traditionally, a user is forced to pause this conversation and go retrieve information which is useful and relevant to the context of the conversation.  What if we could minimize this problem to where no pause occurs in the conversation, but instead continues this fluid motion?</p>
+                    <p>For example, a presenter of information tends to promote discussion throughout a presentation.  In particular, the discussion surrounding the topic can lead to problems when the talking points deviate from the intended ordered design of the presentation.  The audience, could potentially focus their attention on irrelevant presentation data, or even be forced to remove their attention and query the information themselves. </p>
+                    <p>A process or software tool in which injects reliable information based on the surrounding discussion or topic has a possibility of enhancing a learning process and continuing the ongoing discussion.  In order to solve this problem, its been broken down into three question segments:</p>
+                    <p>First, <strong>can we store unstructured document data in an organized manner so it can later be retrieved?</strong>  Information comes in many forms like web pages, slides, pdf, word documents.  Storing all of these documents into a single database instance for searching will require an organized relational design.  The extraction is another key focus point in this problem.  Each document type will require a proprietary extraction method to properly store it’s containing information. </p>
+                    <p>Next, <strong>can we query these stored unstructured documents based on a surrounding discussion or topic?  In other words, can we use a text based discussion which is currently ongoing to query a database of possible relevant document data?</strong> </p>
+                    <p>Lastly, <strong>can we inject these unstructured documents into a platform in which the end user can view and use?</strong>  In theory, this would allow the user to view the most relevant and useful information based on the surrounding discussion at the given moment.</p>
                 </div>
             </div>
             <div class="panel panel-primary">

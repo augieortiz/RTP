@@ -6,6 +6,7 @@ $def with (message, url, status, logged, user)
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="static/bootstrap.css">
+  <meta charset="utf-8">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
@@ -45,9 +46,8 @@ $def with (message, url, status, logged, user)
 		<form method="post" name="convoForm" onsubmit=" return validateForm()" action="receive">
 		<input type="textarea" class="form-control" rows="5" name="conversation" /> 
 		<br>
-		<input disabled type="submit" value="Find Presentation Data" />
+		<input type="submit" value="Find Presentation Data" />
 		</form>
-    <p style="color: red;">This feild is currently under development and has been disabled.</p>
 		<br>
 		$if status == 'success':
 			<div class="alert alert-success" role="alert">

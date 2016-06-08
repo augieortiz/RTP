@@ -1,7 +1,13 @@
-#!/usr/bin/python
-import web
+# Implementation of RAKE - Rapid Automtic Keyword Exraction algorithm
+# as described in:
+# Rose, S., D. Engel, N. Cramer, and W. Cowley (2010). 
+# Automatic keyword extraction from indi-vidual documents. 
+# In M. W. Berry and J. Kogan (Eds.), Text Mining: Applications and Theory.unknown: John Wiley and Sons, Ltd.
+
 import re
 import operator
+import sys, os
+import os.path
 
 debug = False
 test = True
@@ -132,31 +138,5 @@ class Rake(object):
         sorted_keywords = sorted(keyword_candidates.iteritems(), key=operator.itemgetter(1), reverse=True)
         return sorted_keywords
 
-def txtRake(text):
 
-    # Split text into sentences
-    sentenceList = split_sentences(text)
-    #stoppath = "FoxStoplist.txt" #Fox stoplist contains "numbers", so it will not find "natural numbers" like in Table 1.1
-    stoppath = "SmartStoplist.txt"  #SMART stoplist misses some of the lower-scoring keywords in Figure 1.5, which means that the top 1/3 cuts off one of the 4.0 score words in Table 1.1
-    stopwordpattern = build_stop_word_regex(stoppath)
-
-    # generate candidate keywords
-    phraseList = generate_candidate_keywords(sentenceList, stopwordpattern)
-
-    # calculate individual word scores
-    wordscores = calculate_word_scores(phraseList)
-
-    # generate candidate keyword scores
-    keywordcandidates = generate_candidate_keyword_scores(phraseList, wordscores)
-    if debug: print keywordcandidates
-
-    sortedKeywords = sorted(keywordcandidates.iteritems(), key=operator.itemgetter(1), reverse=True)
-    if debug: print sortedKeywords
-
-    totalKeywords = len(sortedKeywords)
-
-
-    rake = Rake("SmartStoplist.txt")
-    keywords = rake.run(text)
-    return keywords
 

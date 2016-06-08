@@ -1,4 +1,5 @@
 import sys, os
+sys.path.append('var/www/RTP')
 import web
 import json
 import sys
@@ -13,6 +14,7 @@ import operator
 import re
 import lxml.etree
 import hashlib
+from rake import *
 
 
 urls = (
@@ -105,11 +107,11 @@ class receive:
             present = data[0]
             try: 
                 if not data[0]:
-                    return render.receive(data, "http://augie.devao.me", "error")
+                    return render.receive("Looks like you there was no data found...Try again maybe.", "http://research.devao.me/ThisIsNotTheDataYouAreLookingFor", "error", "True", session.user)
                 else:
                     return render.receive("We found the presentation data of:  " + present[0], present[0], "success", "True", session.user)
             except Exception,e:
-                return render.receive(str(e), "", "True", session.user)
+                return render.receive(str(e), "Error on data retrieval", "", "True", session.user)
 class add:
     def GET(self):
             render = web.template.render("/var/www/RTP/templates/")
@@ -200,6 +202,33 @@ def searchDatbaseRake(db, keywords):
             searchData = []
             "Error on results. Retry."
     return searchData, maxIndex
+def txtRake(text):
+
+    # Split text into sentences
+    sentenceList = split_sentences(text)
+    scriptpath = os.path.dirname(__file__)
+    stoppath = os.path.join(scriptpath, 'SmartStoplist.txt')
+    stopwordpattern = build_stop_word_regex(stoppath)
+
+    # generate candidate keywords
+    phraseList = generate_candidate_keywords(sentenceList, stopwordpattern)
+
+    # calculate individual word scores
+    wordscores = calculate_word_scores(phraseList)
+
+    # generate candidate keyword scores
+    keywordcandidates = generate_candidate_keyword_scores(phraseList, wordscores)
+    if debug: print keywordcandidates
+
+    sortedKeywords = sorted(keywordcandidates.iteritems(), key=operator.itemgetter(1), reverse=True)
+    if debug: print sortedKeywords
+
+    totalKeywords = len(sortedKeywords)
+
+
+    rake = Rake(stoppath)
+    keywords = rake.run(text)
+    return keywords
 
 def logged():
     if session.get('login', 1):

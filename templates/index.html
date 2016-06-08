@@ -9,7 +9,9 @@ $def with (logged, user)
         <link rel="stylesheet" href="static/bootstrap.css" type="text/css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="static/animate.css" type="text/css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        <link href="static/favicon.ico" rel="icon" type="image/x-icon" />
     </head>
     <body>
         <nav class="navbar navbar-inverse">
@@ -23,12 +25,12 @@ $def with (logged, user)
                     <a class="active navbar-brand" href="#"><span style="font-size: 75%">research</span>DevAO</a>
                 </div>
                 <div class="collapse navbar-collapse" id="myNavbar">
-                    <ul class="nav navbar-nav navbar-collapse">
+                    <ul class="nav navbar-nav navbar-collapse animated fadeInDown">
                         <li><a href="/add">Add Data</a></li>
                         <li><a href="/receive">Receive Data</a></li>
                         <li><a href="/thesis">Thesis</a></li>
                     </ul>
-                    <ul class="nav navbar-nav navbar-right">
+                    <ul class="nav navbar-nav navbar-right animated fadeInDown">
                         $if logged == 'True':
                             <li><a href="#">Welcome, <strong>$user</strong></a></li>
                             <li><a href="/logout">Log Out</a></li>
@@ -38,7 +40,7 @@ $def with (logged, user)
                 </div>
             </div>
         </nav>
-        <div class="container">
+        <div class="container animated fadeIn">
             <div class="page-header">
       			<h1>RTP<small> - Real Time Presentation API</small></h1>
       			<h4>A proof of concept for the research being done at The Ohio State University by Agustin Ortiz advised by Rajiv Ramnanth</h4>

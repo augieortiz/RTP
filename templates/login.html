@@ -8,10 +8,12 @@ $def with (status, message)
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="static/bootstrap.css" type="text/css">
         <link rel="stylesheet" href="static/login.css" type="text/css">
+         <link rel="stylesheet" href="static/animate.css" type="text/css">
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="static/login.js"></script>
         <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        <link href="static/favicon.ico" rel="icon" type="image/x-icon" />
     </head>
     <body>
         <nav class="navbar navbar-inverse">
@@ -43,20 +45,20 @@ $def with (status, message)
     -->
     <div class="container">
         $if status == 'error':
-            <div class="alert alert-danger" role="alert">
+            <div class="animated shake alert alert-danger" role="alert">
                 <a href="#" class="alert-link">$message</a>
             </div>
         $if status == 'warning':
-            <div class="alert alert-warning" role="alert">
+            <div class="animated shake alert alert-warning" role="alert">
                 <a href="#" class="alert-link">$message</a>
             </div>
         $if status == 'alert':
-            <div class="alert alert-info" role="alert">
+            <div class="animated shake alert alert-info" role="alert">
                 <a href="#" class="alert-link">$message</a>
             </div>
         <div class="card card-container">
             <!-- <img class="profile-img-card" src="//lh3.googleusercontent.com/-6V8xOA6M7BA/AAAAAAAAAAI/AAAAAAAAAAA/rzlHcD0KYwo/photo.jpg?sz=120" alt="" /> -->
-            <img id="profile-img" class="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />
+            <img id="profile-img" class="profile-img-card" src="static/brutus_buckeye.png" />
             <p id="profile-name" class="profile-name-card"></p>
             <form method="POST" action="login" class="form-signin" name="formLogin">
                 <span id="reauth-email" class="reauth-email"></span>
