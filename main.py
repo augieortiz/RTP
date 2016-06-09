@@ -92,7 +92,7 @@ class receive:
     def GET(self):
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
-    			return render.receive("http://osu.edu", "http://osu.edu", "success", "True", session.user)
+    			return render.receive("http://osu.edu", "http://osu.edu", "success", "True", session.user, "")
             else:
                 return render.login("warning", "You must login before you receive data.")
     def POST(self):
@@ -101,23 +101,24 @@ class receive:
             db.RTP.create_index([('title', TEXT), ('document', TEXT)], default_language='english')
             search = convo['conversation']
             keywords = watsonProcess(search)
-            data = []
             data, index = searchDatbaseRake(db, keywords)
-            render = web.template.render('/var/www/RTP/templates/') 
-            present = data[0]
-            try: 
-                if not data[0]:
-                    return render.receive("Looks like you there was no data found...Try again maybe.", "http://research.devao.me/ThisIsNotTheDataYouAreLookingFor", "error", "True", session.user)
+            render = web.template.render('/var/www/RTP/templates/')
+            newdata = convertArray(data)
+            newdata = sorted(newdata, key=lambda x: x[1], reverse=True)
+            try:
+                if not data[1]:
+                    return render.receive("Looks like you there was no data found...Try again maybe.", "http://research.devao.me/ThisIsNotTheDataYouAreLookingFor", "error", "True", session.user, "notfound")
                 else:
-                    return render.receive("We found the presentation data of:  " + present[0], present[0], "success", "True", session.user)
+                    present = data[0][index] 
+                    return render.receive("We found the presentation data of:  " + present, present, "success", "True", session.user, newdata)
             except Exception,e:
-                return render.receive(str(e), "Error on data retrieval", "", "True", session.user)
+                return render.receive("Looks like you there was no data found...Try again maybe.", "Error on data retrieval", "", "True", session.user, "notfound")
 class add:
     def GET(self):
-            result = getAllData()
+            result, count = getAllData()
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
-			    return render.add("", "", 'True', session.user, result)
+			    return render.add("", "", 'True', session.user, result, count)
             else:
                 return render.login("warning", "You must login before you add data.")
     def POST(self):
@@ -138,25 +139,48 @@ class add:
             title = t.text
             document  = visible_text
 
+            isDuplicate = checkDupURL(url['url'])
 
             #INSERT DATAPOINT
-            query = db.RTP.insert_one( { "url": address, "title" : title, "document" : document })
+            if isDuplicate == True:
+                result, count = getAllData()
+                render = web.template.render("/var/www/RTP/templates/")
+                return render.add("Failure.  This site has already been added.", "error", "True", session.user, result, count)
+            else:
+                result, count = getAllData()
+                query = db.RTP.insert_one( { "url": address, "title" : title, "document" : document })
+                render = web.template.render('/var/www/RTP/templates/') 
+                return render.add("Success.  The site: " + title + " has been added into the database.", "success", "True", session.user, result, count)
 
-            #GET NEW LIST
-            result = getAllData()
-
-            render = web.template.render('/var/www/RTP/templates/') 
-            return render.add("Success.  The site: " + title + " has been added into the database.", "success", "True", session.user, result)
         except Exception,e: 
+            result = getAllData()
             render = web.template.render("/var/www/RTP/templates/")
-            return render.add("Failure.  The site has not been added into the database.", "error", "success", "True", session.user, result)
+            return render.add(str(e), "error", "True", session.user, result, count)
+
+def convertArray(data):
+    newList = [];
+    for count,row in enumerate(data[0]):
+        newTup = (data[0][count], data[1][count], data[2][count])
+        newList.append(newTup) 
+    return newList 
+
 def getAllData():
     #Database connections
     client = MongoClient()
     db = client.RTP
     query = db.RTP.find( {}, {"title": -1 })
-    return query
+    count = db.RTP.find( {}, {"title": -1 }).count()
+    return query, count
 
+def checkDupURL(url):
+    client = MongoClient()
+    db = client.RTP
+    count = db.RTP.find( {"url": url} ).count()
+    
+    if count > 0:
+        return True
+    else: 
+        return False
 
 def connectToDatabase():
     print "Establishing connection to database.."
@@ -211,7 +235,6 @@ def searchDatbaseRake(db, keywords):
                 if searchData[1][index] > maxScore:
                     maxScore = searchData[1][index]
                     maxIndex = index
-            
         except IndexError:
             searchData = []
             "Error on results. Retry."
@@ -253,7 +276,6 @@ def logged():
 def notfound():
     render = web.template.render("/var/www/RTP/templates/")
     return web.notfound(render.notfound("This is not the page you're looking for..."));
-
 
     # You can use template result like below, either is ok:
     #return web.notfound(render.notfound())

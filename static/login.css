@@ -127,3 +127,10 @@
 .forgot-password:focus{
     color: rgb(12, 97, 33);
 }
+
+table.sortable thead {
+    background-color:#eee;
+    color:#666666;
+    font-weight: bold;
+    cursor: default;
+}
