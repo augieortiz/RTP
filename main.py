@@ -25,7 +25,7 @@ urls = (
         '/login', 'login',
         '/logout', 'Kill'
 )
-web.config.debug = False
+web.config.debug = True
 
 app = web.application(urls, globals())
 application = app.wsgifunc()
@@ -114,9 +114,10 @@ class receive:
                 return render.receive(str(e), "Error on data retrieval", "", "True", session.user)
 class add:
     def GET(self):
+            result = getAllData()
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
-			    return render.add("", "", 'True', session.user)
+			    return render.add("", "", 'True', session.user, result)
             else:
                 return render.login("warning", "You must login before you add data.")
     def POST(self):
@@ -127,23 +128,36 @@ class add:
 
             url = web.input()
             page = requests.get(url['url'])
-            soup = BeautifulSoup(page.text, 'html.parser')
+            soup = BeautifulSoup(page.text)
             t = soup.find('title')
             [s.extract() for s in soup(['style', 'script', '[document]', 'head', 'title'])]
             visible_text = soup.getText()
-            visible_text = visible_text.encode("utf-8")
             visible_text = os.linesep.join([s for s in visible_text.splitlines() if s])
+            visible_text = visible_text.replace("\n", " ")
             address = url['url']
             title = t.text
             document  = visible_text
 
+
             #INSERT DATAPOINT
             query = db.RTP.insert_one( { "url": address, "title" : title, "document" : document })
+
+            #GET NEW LIST
+            result = getAllData()
+
             render = web.template.render('/var/www/RTP/templates/') 
-            return render.add("Success.  The site: " + title + " has been added into the database.", "success", "True", session.user)
+            return render.add("Success.  The site: " + title + " has been added into the database.", "success", "True", session.user, result)
         except Exception,e: 
             render = web.template.render("/var/www/RTP/templates/")
-            return render.add("Failure.  The site has not been added into the database.", "error", "success", "True", session.user)
+            return render.add("Failure.  The site has not been added into the database.", "error", "success", "True", session.user, result)
+def getAllData():
+    #Database connections
+    client = MongoClient()
+    db = client.RTP
+    query = db.RTP.find( {}, {"title": -1 })
+    return query
+
+
 def connectToDatabase():
     print "Establishing connection to database.."
     try:

@@ -1,4 +1,4 @@
-$def with (message, status, logged, user)
+$def with (message, status, logged, user, result)
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,6 +56,14 @@ $def with (message, status, logged, user)
         </div>
 
   </div>
+  <div class="list-group">
+    <a href="#" class="list-group-item active">
+      Current RTP Database Collection
+    </a>
+    $for item in result:
+    <a href="#" class="list-group-item">$item</a>
+  </div>
+
 </body>
 </html>
 <script>
