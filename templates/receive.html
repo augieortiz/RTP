@@ -63,7 +63,7 @@ $def with (message, url, status, logged, user, data)
         <div class="row" style="height: 100%;">
         <div class="col-sm-6">
              <div class="panel panel-default">
-              <div class="panel-heading">Search Results</div>
+              <div class="panel-heading" style="color: white; background-color: #b00">Search Results</div>
               <div class="table-responsive">
                   <table id="results" class="table sortable">
                     <thead>
@@ -76,14 +76,14 @@ $def with (message, url, status, logged, user, data)
                       <tbody>
                       $if data != "" and data!= "notfound":
                           $for count,result in enumerate(data):
-                              <tr>
+                              <tr class="active">
                                   <th scope="row">${count+1}</th>
                                   <td>$data[count][0]</td>
                                   <td>$data[count][1]</td>
                                   <td>$data[count][2]</td>
                               </tr> 
                        $if data == "notfound":
-                          $for num in range(1,5):
+                          $for num in range(0,1):
                               <tr>
                                   <th scope="row">&#x2049</th>
                                   <td><h3>&#x1f47b</h3></td>

@@ -147,13 +147,13 @@ class add:
                 render = web.template.render("/var/www/RTP/templates/")
                 return render.add("Failure.  This site has already been added.", "error", "True", session.user, result, count)
             else:
-                result, count = getAllData()
                 query = db.RTP.insert_one( { "url": address, "title" : title, "document" : document })
+                result, count = getAllData()
                 render = web.template.render('/var/www/RTP/templates/') 
                 return render.add("Success.  The site: " + title + " has been added into the database.", "success", "True", session.user, result, count)
 
         except Exception,e: 
-            result = getAllData()
+            result,count = getAllData()
             render = web.template.render("/var/www/RTP/templates/")
             return render.add(str(e), "error", "True", session.user, result, count)
 

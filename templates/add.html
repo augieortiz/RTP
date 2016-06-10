@@ -54,16 +54,20 @@ $def with (message, status, logged, user, result, count)
         <div class="alert alert-danger" role="alert">
           <a href="#" class="alert-link">$message</a>
         </div>
-
+    <p style="color: red; font-size: 75%;">*Current database set up for single instance.  Instance topic covers The Ohio State University - Computer Science & Engineering Department</p>
+    <div class="panel panel-default" style="color: white; background-color: #b00">
+      <div class="panel-body">
+        <div class="panel-info">Current RTP Database Collection: $count documents </div>
+      </div>
+      <div class="list-group">
+        $for index,item in enumerate(result):
+        <a data-toggle="collapse" href="#drop$index" class="list-group-item"><strong>$item['title']</strong></a>
+        <div class="collapse" id="drop$index">
+          <a href="#" class="list-group-item active">$item</a>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="list-group">
-    <a href="#" class="list-group-item active">
-      Current RTP Database Collection: $count documents 
-    </a>
-    $for item in result:
-    <a href="#" class="list-group-item">$item</a>
-  </div>
-
 </body>
 </html>
 <script>
