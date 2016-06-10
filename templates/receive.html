@@ -60,42 +60,44 @@ $def with (message, url, status, logged, user, data)
   			</div>
     </div>
     <div class="container-fluid">
-        <div class="row">
+        <div class="row" style="height: 100%;">
         <div class="col-sm-6">
-             <div class="panel panel-default" style="min-height: 400px;">
+             <div class="panel panel-default">
               <div class="panel-heading">Search Results</div>
-                <table id="results" class="table sortable">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Result</th>
-                      <th>Score</th>
-                      <th>Keyword/Phrase</th>
-                    </tr>
-                    <tbody>
-                    $if data != "" and data!= "notfound":
-                        $for count,result in enumerate(data):
-                            <tr>
-                                <th scope="row">${count+1}</th>
-                                <td>$data[count][0]</td>
-                                <td>$data[count][1]</td>
-                                <td>$data[count][2]</td>
-                            </tr> 
-                     $if data == "notfound":
-                        $for num in range(1,5):
-                            <tr>
-                                <th scope="row">&#x2049</th>
-                                <td><h3>&#x1f47b</h3></td>
-                                <td>&#x274c</td>
-                                <td>&#x1f198</td>
-                            </tr> 
-                    </tbody>
-                  </thead>
-                </table>
+              <div class="table-responsive">
+                  <table id="results" class="table sortable">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Result</th>
+                        <th>Score</th>
+                        <th>Keyword/Phrase</th>
+                      </tr>
+                      <tbody>
+                      $if data != "" and data!= "notfound":
+                          $for count,result in enumerate(data):
+                              <tr>
+                                  <th scope="row">${count+1}</th>
+                                  <td>$data[count][0]</td>
+                                  <td>$data[count][1]</td>
+                                  <td>$data[count][2]</td>
+                              </tr> 
+                       $if data == "notfound":
+                          $for num in range(1,5):
+                              <tr>
+                                  <th scope="row">&#x2049</th>
+                                  <td><h3>&#x1f47b</h3></td>
+                                  <td>&#x274c</td>
+                                  <td>&#x1f198</td>
+                              </tr> 
+                      </tbody>
+                    </thead>
+                  </table>
+                </div>
               </div>
             </div>
           <div class="col-sm-6">
-                <iframe id="frameDemo" src=$url style="width: 100%; min-height: 400px "> </iframe>
+                <iframe id="frameDemo" src=$url style="width: 100%; height: 100vh "> </iframe>
           </div>
         </div>
 
