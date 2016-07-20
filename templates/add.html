@@ -1,4 +1,4 @@
-$def with (message, status, logged, user, result, count)
+$def with (message, status, logged, user, result, count, instances, selected)
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +10,7 @@ $def with (message, status, logged, user, result, count)
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="static/bootstrap.css">
   <link rel='shortcut icon' href='static/favicon.ico'>
+   <script src="static/add.js"></script>
 </head>
 <body>
   <nav class="navbar navbar-default">
@@ -37,14 +38,84 @@ $def with (message, status, logged, user, result, count)
                     </ul>
                 </div>
             </div>
-        </nav>
+  </nav>
   <div class="container">
-  <h3 class="text-center"><strong>Beta v1.0.1.1</strong></h3>
-     <h3>Add new URL</h3>
+      <h3 class="text-center"><strong>Beta v1.0.1.1</strong></h3>
+      <h3>Add new URL</h3>
       <p>Enter a valid URL.  The page will be scraped and stored in the MongoDB as a presentation data</p> 
-     <form name="addURL" method="post" action="add" onsubmit=" return validateForm()" >
-    <p><input style="width: 40%" type="text" name="url" /> <input type="submit" value="Add" /></p>
-    <br>
+      <label for="sel1">Select Instance:</label>
+      <div class="row">
+          <div class="col-md-5">
+         <form method="POST" action="instancec">
+              <select name="selInt" id="instances" class="form-control" id="sel1" onchange="this.form.submit()">  
+                  $for index,item in enumerate(instances):
+                      $if item == selected:
+                          <option selected value="$item">$item</option>
+                      $else:
+                          <option value="$item">$item</option>
+              </select>
+          </form>
+          </div>
+          <div class="col-md-1">
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Action <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a data-toggle='modal' data-target="#addInstance" href="#">Add New Instance</a></li>
+                  <li id="deleteButton"><a data-toggle='modal' data-target="#confirm-delete" href="#">Delete Instance</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#">Help</a></li>
+                </ul>
+              </div>
+        </div>
+      </div>
+      <div id="addInstance" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Add New Instance</h4>
+                  </div>
+                  <form method="POST" action="instance">
+                    <div class="modal-body">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1">New Instance Name</span>
+                            <input name="newInstance" type="text" class="form-control" placeholder="Instance Name" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                    <div class="modal-footer">    
+                            <button type="submit" class="btn btn-default">Submit</button>
+                    </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+      <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Confirm Instance Deletion            </div>
+            <form method="POST" action="instanced">
+              <div class="modal-body">
+              This will delete the instance, <strong><span style="color: red;" id="SI"/></strong> and all it's associated data.
+              </div>
+              <input hidden name="deleteInstance" id="inputSI" type="text"/>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <button type="submit" class="btn btn-danger btn-ok">Delete</button>
+              </div>
+            </form>
+        </div>
+    </div>
+</div>
+  <br>
+  <div>
+      <form name="addURL"  method="post" action="add"  onsubmit=" return validateForm()" >
+      <p><input style="width: 40%" placeholder="Enter URL" type="text" name="url" /> <input type="submit" value="Add" /></p>
+      </form>
+  </div>
+  <br>
     $if status == 'success':
         <div class="alert alert-success" role="alert">
           <a href="#" class="alert-link">$message</a>
@@ -55,19 +126,29 @@ $def with (message, status, logged, user, result, count)
         <div class="alert alert-danger" role="alert">
           <a href="#" class="alert-link">$message</a>
         </div>
-    <p style="color: red; font-size: 75%;">*Current database set up for single instance.  Instance topic covers The Ohio State University - Computer Science & Engineering Department</p>
-    <div class="panel panel-default" style="color: white; background-color: #b00">
-      <div class="panel-body">
-        <div class="panel-info">Current RTP Database Collection: $count documents </div>
+    <p style="color: red; font-size: 80%;">*Current version <strong>supports </strong> multiple instances for testing.</p>
+      <div class="panel panel-default">
+      <div class="panel-heading" style="color: white; background-color: #b00">Current RTP Database Collection: $count documents </div>
+        <table class="table table-hover">
+          <tbody>
+            $for index,item in enumerate(result):
+                <tr>
+                  <td>
+                    <span class="glyphicon glyphicon-file"></span>
+                      $item['title']
+                  </td>
+                  <td class="text-right text-nowrap">
+                    <button class="btn btn-xs btn-info">HTML</button>
+                    <button onclick="confirmDelete(&#39;$item['_id']&#39;)" id="$item['_id']" class="btn btn-xs btn-danger">
+                      <span class="glyphicon glyphicon-trash"></span>
+                      </button>
+                      <form><button hidden text="Delete" value="$item['_id']" type="submit" formmethod="post" formaction="documentd" name="dataDocument" id="cd$item['_id']" class="hidden btn btn-xs btn-danger">Delete</button>
+                    </button>
+                  </td>
+                </tr>
+          </tbody>
+        </table>
       </div>
-      <div class="list-group">
-        $for index,item in enumerate(result):
-        <a data-toggle="collapse" href="#drop$index" class="list-group-item"><strong>$item['title']</strong></a>
-        <div class="collapse" id="drop$index">
-          <a href="#" class="list-group-item active">$item</a>
-        </div>
-      </div>
-    </div>
   </div>
 </body>
 </html>

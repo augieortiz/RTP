@@ -15,6 +15,7 @@ import re
 import lxml.etree
 import hashlib
 from rake import *
+from bson.objectid import ObjectId
 
 
 urls = (
@@ -23,7 +24,11 @@ urls = (
 		'/add', 'add',
         '/thesis', 'thesis',
         '/login', 'login',
-        '/logout', 'Kill'
+        '/logout', 'Kill',
+        '/instance', 'instance', 
+        '/instanced', 'instanced',
+        '/instancec', 'instancec',
+        '/documentd', 'documentd'
 )
 web.config.debug = True
 
@@ -34,7 +39,7 @@ db = web.database(dbn='mysql', user='root', pw='Augie03!', db='dbRTP')
 
 
 store = web.session.DBStore(db, 'sessions')
-session = web.session.Session(app, store, initializer={'login': 0,'privilege': 0,'user':'anonymous'})
+session = web.session.Session(app, store, initializer={'login': 0,'privilege': 0,'user':'anonymous', 'instanceSelected': 'none',  'instanceList': []})
 
 class index:
     def GET(self):
@@ -66,7 +71,7 @@ class login:
             ident = db.select('Users', where='email=$name', vars=locals())[0]
         except IndexError:
             render = web.template.render("/var/www/RTP/templates/")
-            return render.login("error", "This is not an account with us. Please contact the admin to recieve an account.")
+            return render.login("error", "This is not an account with us. Please contact the admin to receive an account.")
         else:
             try:
                 if passwd == ident['pass']:
@@ -74,6 +79,10 @@ class login:
                     session.privilege = ident['privilege']
                     session.user = ident['user']
                     render = web.template.render("/var/www/RTP/templates/")
+
+                    #Get all the instance and set the session variable
+                    instances = getInstances()
+                    session.instanceList = instances
                     return render.index('True', session.user)
                 else:
                     render = web.template.render("/var/www/RTP/templates/")
@@ -92,7 +101,7 @@ class receive:
     def GET(self):
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
-    			return render.receive("http://osu.edu", "http://osu.edu", "success", "True", session.user, "")
+    			return render.receive("http://osu.edu", "http://osu.edu", "success", "True", session.user, "", session.instanceSelected)
             else:
                 return render.login("warning", "You must login before you receive data.")
     def POST(self):
@@ -107,18 +116,75 @@ class receive:
             newdata = sorted(newdata, key=lambda x: x[1], reverse=True)
             try:
                 if not data[1]:
-                    return render.receive("Looks like you there was no data found...Try again maybe.", "http://research.devao.me/ThisIsNotTheDataYouAreLookingFor", "error", "True", session.user, "notfound")
+                    return render.receive("Looks like you there was no data found...Try again maybe.", "http://research.devao.me/ThisIsNotTheDataYouAreLookingFor", "error", "True", session.user, "notfound", session.instanceSelected)
                 else:
                     present = data[0][index] 
-                    return render.receive("We found the presentation data of:  " + present, present, "success", "True", session.user, newdata)
+                    return render.receive("We found the presentation data of:  " + present, present, "success", "True", session.user, newdata, session.instanceSelected)
             except Exception,e:
-                return render.receive("Looks like you there was no data found...Try again maybe.", "Error on data retrieval", "", "True", session.user, "notfound")
+                return render.receive("Looks like you there was no data found...Try again maybe.", "Error on data retrieval", "", "True", session.user, "notfound", session.instanceSelected)
+
+class documentd:
+    def POST(self):
+
+            dele = web.input()
+            client = MongoClient()
+            db = client.RTP
+            render = web.template.render("/var/www/RTP/templates/")
+            ident = dele['dataDocument']
+            query = db.RTP.delete_one( {"_id" : ObjectId(ident)})
+            if logged():
+                 raise web.seeother('/add')
+            else:
+                return render.login("warning", "You must login before you add data.")
+
+class instance:
+    def POST(self):
+
+            newInstance = web.input()
+            client = MongoClient()
+            db = client.RTP
+            render = web.template.render("/var/www/RTP/templates/")
+            #insert new instance - username hard coded at the moment
+            query = db.Instances.insert( {"username": session.user, "topic": newInstance['newInstance']})
+            instances = getInstances()
+            session.instanceSelected = newInstance['newInstance']
+            session.instanceList = instances            
+            if logged():
+                raise web.seeother('/add')
+            else:
+                return render.login("warning", "You must login before you add data.")
+class instanced:
+    def POST(self):
+
+            dele = web.input()
+            client = MongoClient()
+            db = client.RTP
+            render = web.template.render("/var/www/RTP/templates/")
+            #insert new instance - username hard coded at the moment
+            query = db.Instances.delete_one( {"username" : session.user, "topic": dele['deleteInstance']})
+            instances = getInstances()
+            session.instanceList = instances
+            session.instanceSelected = instances[0]
+            if logged():
+                raise web.seeother('/add')
+            else:
+                return render.login("warning", "You must login before you add data.")
+class instancec:
+    def POST(self):
+            selection = web.input()
+            session.instanceSelected = selection['selInt']
+            result, count = getAllData()                
+
+            if logged():
+                 raise web.seeother('/add')
+            else:
+                return render.login("warning", "You must login before you add data.")
 class add:
     def GET(self):
-            result, count = getAllData()
+            result, count = getAllData()                
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
-			    return render.add("", "", 'True', session.user, result, count)
+			    return render.add("", "", 'True', session.user, result, count, session.instanceList, session.instanceSelected)
             else:
                 return render.login("warning", "You must login before you add data.")
     def POST(self):
@@ -140,22 +206,25 @@ class add:
             document  = visible_text
 
             isDuplicate = checkDupURL(url['url'])
-
+            instances = getInstances()
             #INSERT DATAPOINT
             if isDuplicate == True:
                 result, count = getAllData()
+                
                 render = web.template.render("/var/www/RTP/templates/")
-                return render.add("Failure.  This site has already been added.", "error", "True", session.user, result, count)
+                return render.add(url, "error", "True", session.user, result, count, session.instanceList, session.instanceSelected)
             else:
-                query = db.RTP.insert_one( { "url": address, "title" : title, "document" : document })
+            	iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
+                query = db.RTP.insert_one( { "url": address, "title" : title, "document" : document, "instanceID": iid['_id'] })
                 result, count = getAllData()
                 render = web.template.render('/var/www/RTP/templates/') 
-                return render.add("Success.  The site: " + title + " has been added into the database.", "success", "True", session.user, result, count)
+                return render.add("Success.  The site: " + title + " has been added into the database.", "success", "True", session.user, result, count, session.instanceList, session.instanceSelected)
 
         except Exception,e: 
+            instances = getInstances()
             result,count = getAllData()
             render = web.template.render("/var/www/RTP/templates/")
-            return render.add(str(e), "error", "True", session.user, result, count)
+            return render.add(str(e), "error", "True", session.user, result, count, session.instanceList, session.instanceSelected)
 
 def convertArray(data):
     newList = [];
@@ -168,9 +237,23 @@ def getAllData():
     #Database connections
     client = MongoClient()
     db = client.RTP
-    query = db.RTP.find( {}, {"title": -1 })
-    count = db.RTP.find( {}, {"title": -1 }).count()
-    return query, count
+    iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
+    query = db.RTP.find( {"instanceID" : iid['_id']}, {"title": -1 })
+    return query, query.count()
+
+def getInstances():
+
+	iList = []
+	client = MongoClient()
+	db = client.RTP
+	query = db.Instances.find( {"username" : session.user }, {"topic" : -1})
+	for index,item in enumerate(query):
+		iList.append(item['topic'])
+
+	if session.instanceSelected == 'none':
+		session.instanceSelected = iList[0]
+
+	return iList
 
 def checkDupURL(url):
     client = MongoClient()
@@ -212,11 +295,10 @@ def searchDatbaseRake(db, keywords):
     searchData.append([])
     searchData.append([])
     keywords = keywords.most_common(25)
-    print "Starting search through wikiFootball..."
-    print "Searching for top result..."
     for x in range (0,len(keywords)):
         try:
-            result = db.RTP.aggregate( [ { "$match": { "$text": { "$search": keywords[x][0] } } },  { "$project": { "url": -1, "_id": 0, "score": { "$meta": "textScore" } } }, { "$match": { "score": {  "$gt": 1 } } } ]) 
+        	iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
+    		result = db.RTP.aggregate( [ { "$match": { "$text": { "$search": keywords[x][0] } } },  { "$project": { "url": -1, "_id": 0, "score": { "$meta": "textScore" } } }, { "$match": { "instanceID" : iid['_id'], "score": {  "$gt": 1 } } } ])
         except RuntimeError:
             print "Search has failed with keywords : " + keywords[x][0] + ". Retrying with next keyword."
         for document in result:

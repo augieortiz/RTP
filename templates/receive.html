@@ -1,4 +1,4 @@
-$def with (message, url, status, logged, user, data)
+$def with (message, url, status, logged, user, data, instance)
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,6 +44,7 @@ $def with (message, url, status, logged, user, data)
     <div class="container">
     <h3 class="text-center"><strong>Beta v1.0.1.1</strong></h3>
        <h3>Receive Presentation Data</h3>
+       <h4>Current Instance: <span style="color: #b00"><strong>$instance</strong></span></h4>
         <p>Enter any text, conversation, or transcript.  The MongoDB will be searched and queried to locate the most relevant presentation data.</p> 
   		<form method="post" name="convoForm" onsubmit=" return validateForm()" action="receive">
   		<input type="textarea" class="form-control" rows="5" name="conversation" /> 
