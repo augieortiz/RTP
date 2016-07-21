@@ -47,7 +47,7 @@ $def with (message, url, status, logged, user, data, instance)
        <h4>Current Instance: <span style="color: #b00"><strong>$instance</strong></span></h4>
         <p>Enter any text, conversation, or transcript.  The MongoDB will be searched and queried to locate the most relevant presentation data.</p> 
   		<form method="post" name="convoForm" onsubmit=" return validateForm()" action="receive">
-  		<input type="textarea" class="form-control" rows="5" name="conversation" /> 
+  		<textarea type="textarea" class="form-control" rows="5" name="conversation"></textarea> 
   		<br>
   		<input type="submit" value="Find Presentation Data" />
   		</form>
@@ -56,7 +56,7 @@ $def with (message, url, status, logged, user, data, instance)
   			<div class="alert alert-success" role="alert">
   	  			<a href="#" class="alert-link">$message has been chosen as the presentation data.</a>
   			</div>
-  		$else:
+  		$if status == 'error':
   			<div class="alert alert-danger" role="alert">
   	  			<a href="#" class="alert-link">$message</a>
   			</div>
@@ -80,7 +80,7 @@ $def with (message, url, status, logged, user, data, instance)
                           $for count,result in enumerate(data):
                               <tr class="active">
                                   <th scope="row">${count+1}</th>
-                                  <td>$data[count][0]</td>
+                                  <td><a href="$data[count][0]" target="frameDemo">$data[count][0]</a></td>
                                   <td>$data[count][1]</td>
                                   <td>$data[count][2]</td>
                               </tr> 
@@ -99,7 +99,7 @@ $def with (message, url, status, logged, user, data, instance)
               </div>
             </div>
           <div class="col-sm-6">
-                <iframe id="frameDemo" src=$url style="width: 100%; height: 100vh "> </iframe>
+                <iframe id="frameDemo" name="frameDemo" src="$url" style="width: 100%; height: 100vh "> </iframe>
           </div>
         </div>
 

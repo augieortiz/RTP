@@ -112,7 +112,11 @@ $def with (message, status, logged, user, result, count, instances, selected)
   <br>
   <div>
       <form name="addURL"  method="post" action="add"  onsubmit=" return validateForm()" >
-      <p><input style="width: 40%" placeholder="Enter URL" type="text" name="url" /> <input type="submit" value="Add" /></p>
+      <div class="input-group">
+          <span class="input-group-addon" id="basic-addon1">http://</span>
+          <input id="url" class="form-control"  placeholder="Enter URL" type="text" name="url" /> 
+         </div>
+          <input type="submit" value="Add" class="form-control btn btn-primary" />
       </form>
   </div>
   <br>
@@ -142,7 +146,7 @@ $def with (message, status, logged, user, result, count, instances, selected)
                     <button onclick="confirmDelete(&#39;$item['_id']&#39;)" id="$item['_id']" class="btn btn-xs btn-danger">
                       <span class="glyphicon glyphicon-trash"></span>
                       </button>
-                      <form><button hidden text="Delete" value="$item['_id']" type="submit" formmethod="post" formaction="documentd" name="dataDocument" id="cd$item['_id']" class="hidden btn btn-xs btn-danger">Delete</button>
+                      <form><button hidden text="Delete" value="$item['_id']" type="submit" formmethod="post" formaction="documentd" name="dataDocument" id="cd$item['_id']" class="hidden btn btn-xs btn-danger">Delete</button></form>
                     </button>
                   </td>
                 </tr>
@@ -155,9 +159,13 @@ $def with (message, status, logged, user, result, count, instances, selected)
 <script>
 function validateForm()
 {
+
+
   var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
   var regex = new RegExp(expression);
   var url = document.forms["addURL"]["url"].value;
+
+
     if (url.match(regex) )
    {
      return true;

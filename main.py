@@ -101,7 +101,7 @@ class receive:
     def GET(self):
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
-    			return render.receive("http://osu.edu", "http://osu.edu", "success", "True", session.user, "", session.instanceSelected)
+    			return render.receive("", "/ThisIsNotTheDataYouAreLookingFor", "first", "True", session.user, "", session.instanceSelected)
             else:
                 return render.login("warning", "You must login before you receive data.")
     def POST(self):
@@ -116,12 +116,12 @@ class receive:
             newdata = sorted(newdata, key=lambda x: x[1], reverse=True)
             try:
                 if not data[1]:
-                    return render.receive("Looks like you there was no data found...Try again maybe.", "http://research.devao.me/ThisIsNotTheDataYouAreLookingFor", "error", "True", session.user, "notfound", session.instanceSelected)
+                    return render.receive("Looks like you there was no data found...Try again maybe.", "/ThisIsNotTheDataYouAreLookingFor", "error", "True", session.user, "notfound", session.instanceSelected)
                 else:
                     present = data[0][index] 
                     return render.receive("We found the presentation data of:  " + present, present, "success", "True", session.user, newdata, session.instanceSelected)
             except Exception,e:
-                return render.receive("Looks like you there was no data found...Try again maybe.", "Error on data retrieval", "", "True", session.user, "notfound", session.instanceSelected)
+                return render.receive("Looks like you there was no data found...Try again maybe.", "Error on data retrieval", "error", "True", session.user, "notfound", session.instanceSelected)
 
 class documentd:
     def POST(self):
@@ -192,20 +192,24 @@ class add:
            #Database connections
             client = MongoClient()
             db = client.RTP
-
             url = web.input()
-            page = requests.get(url['url'])
+            address = url['url']
+
+            if address[0:6] != "http://":
+            	address = "http://" + address
+
+            page = requests.get(address)
             soup = BeautifulSoup(page.text)
             t = soup.find('title')
             [s.extract() for s in soup(['style', 'script', '[document]', 'head', 'title'])]
             visible_text = soup.getText()
             visible_text = os.linesep.join([s for s in visible_text.splitlines() if s])
             visible_text = visible_text.replace("\n", " ")
-            address = url['url']
+            
             title = t.text
             document  = visible_text
 
-            isDuplicate = checkDupURL(url['url'])
+            isDuplicate = checkDupURL(address)
             instances = getInstances()
             #INSERT DATAPOINT
             if isDuplicate == True:
@@ -298,7 +302,8 @@ def searchDatbaseRake(db, keywords):
     for x in range (0,len(keywords)):
         try:
         	iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
-    		result = db.RTP.aggregate( [ { "$match": { "$text": { "$search": keywords[x][0] } } },  { "$project": { "url": -1, "_id": 0, "score": { "$meta": "textScore" } } }, { "$match": { "instanceID" : iid['_id'], "score": {  "$gt": 1 } } } ])
+        	ident = iid['_id']
+    		result = db.RTP.aggregate( [ { "$match": { "$text": { "$search": keywords[x][0] }, "instanceID" : ObjectId(ident) }  },  { "$project": { "url": -1, "_id": 0, "score": { "$meta": "textScore" } } }, { "$match": {  "score": {  "$gt": 1 } } } ])
         except RuntimeError:
             print "Search has failed with keywords : " + keywords[x][0] + ". Retrying with next keyword."
         for document in result:
