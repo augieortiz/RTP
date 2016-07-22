@@ -42,14 +42,13 @@ $def with (message, url, status, logged, user, data, instance)
         </div>
     </nav>
     <div class="container">
-    <h3 class="text-center"><strong>Beta v1.0.1.1</strong></h3>
+    <h3 class="text-center"><strong>Beta v1.3.5.2</strong></h3>
        <h3>Receive Presentation Data</h3>
        <h4>Current Instance: <span style="color: #b00"><strong>$instance</strong></span></h4>
         <p>Enter any text, conversation, or transcript.  The MongoDB will be searched and queried to locate the most relevant presentation data.</p> 
   		<form method="post" name="convoForm" onsubmit=" return validateForm()" action="receive">
   		<textarea type="textarea" class="form-control" rows="5" name="conversation"></textarea> 
-  		<br>
-  		<input type="submit" value="Find Presentation Data" />
+  		<button class="btn btn-info form-control" type="submit" value="Find Presentation Data"> Find Presentation Data </button>
   		</form>
   		<br>
   		$if status == 'success':

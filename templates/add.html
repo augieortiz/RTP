@@ -40,9 +40,10 @@ $def with (message, status, logged, user, result, count, instances, selected)
             </div>
   </nav>
   <div class="container">
-      <h3 class="text-center"><strong>Beta v1.0.1.1</strong></h3>
+      <h3 class="text-center"><strong>Beta v1.3.5.2</strong></h3>
       <h3>Add new URL</h3>
       <p>Enter a valid URL.  The page will be scraped and stored in the MongoDB as a presentation data</p> 
+      <p style="color: red; font-size: 80%;">*Current version <strong>supports </strong> multiple instances for testing.</p>
       <label for="sel1">Select Instance:</label>
       <div class="row">
           <div class="col-md-5">
@@ -113,11 +114,22 @@ $def with (message, status, logged, user, result, count, instances, selected)
   <div>
       <form name="addURL"  method="post" action="add"  onsubmit=" return validateForm()" >
       <div class="input-group">
-          <span class="input-group-addon" id="basic-addon1">http://</span>
+          <span class="input-group-addon" id="basic-addon1">Single Add</span>
           <input id="url" class="form-control"  placeholder="Enter URL" type="text" name="url" /> 
          </div>
-          <input type="submit" value="Add" class="form-control btn btn-primary" />
+          <input type="submit" value="Add" class="form-control btn btn-info" />
       </form>
+      <br>
+      <form name="addSpiderURL" id="addSpiderURL" method="post" action="spider"  onsubmit=" return validateSpiderForm()" >
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">Batch Add</span>
+            <input id="url" class="form-control"  placeholder="Enter URL" type="text" name="url" /> 
+          </div>
+            <button id="btnSpider" data-toggle="tooltip" title="Use this button to add the first level links of a page." type="submit" value="Spider" class="form-control btn btn-danger">
+              <span id="spinner"class="hidden glyphicon glyphicon-refresh spinning"></span> Spider
+            </button>
+      </form>
+      <p style="color: red; font-size: 80%;">*The spider function could take a few moments depending on the size of the site entered.</p>
   </div>
   <br>
     $if status == 'success':
@@ -130,9 +142,8 @@ $def with (message, status, logged, user, result, count, instances, selected)
         <div class="alert alert-danger" role="alert">
           <a href="#" class="alert-link">$message</a>
         </div>
-    <p style="color: red; font-size: 80%;">*Current version <strong>supports </strong> multiple instances for testing.</p>
       <div class="panel panel-default">
-      <div class="panel-heading" style="color: white; background-color: #b00">Current RTP Database Collection: $count documents </div>
+      <div class="panel-heading">Current RTP Database Collection: $count documents </div>
         <table class="table table-hover">
           <tbody>
             $for index,item in enumerate(result):
@@ -156,23 +167,3 @@ $def with (message, status, logged, user, result, count, instances, selected)
   </div>
 </body>
 </html>
-<script>
-function validateForm()
-{
-
-
-  var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
-  var regex = new RegExp(expression);
-  var url = document.forms["addURL"]["url"].value;
-
-
-    if (url.match(regex) )
-   {
-     return true;
-   } 
-   else {
-     alert("This is not a valid URL");
-     return false;
-   }
- }
- </script>

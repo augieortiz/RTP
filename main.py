@@ -15,6 +15,8 @@ import re
 import lxml.etree
 import hashlib
 from rake import *
+import urlparse
+import urllib
 from bson.objectid import ObjectId
 
 
@@ -28,9 +30,10 @@ urls = (
         '/instance', 'instance', 
         '/instanced', 'instanced',
         '/instancec', 'instancec',
-        '/documentd', 'documentd'
+        '/documentd', 'documentd', 
+        '/spider', 'spider'
 )
-web.config.debug = True
+web.config.debug = False
 
 app = web.application(urls, globals())
 application = app.wsgifunc()
@@ -161,6 +164,8 @@ class instanced:
             db = client.RTP
             render = web.template.render("/var/www/RTP/templates/")
             #insert new instance - username hard coded at the moment
+            iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
+            deleteDocuemnts = db.RTP.remove( { "instanceID": iid['_id'] })
             query = db.Instances.delete_one( {"username" : session.user, "topic": dele['deleteInstance']})
             instances = getInstances()
             session.instanceList = instances
@@ -180,11 +185,11 @@ class instancec:
             else:
                 return render.login("warning", "You must login before you add data.")
 class add:
-    def GET(self):
-            result, count = getAllData()                
+    def GET(self):           
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
-			    return render.add("", "", 'True', session.user, result, count, session.instanceList, session.instanceSelected)
+                result, count = getAllData()
+                return render.add("", "", 'True', session.user, result, count, session.instanceList, session.instanceSelected)
             else:
                 return render.login("warning", "You must login before you add data.")
     def POST(self):
@@ -195,8 +200,6 @@ class add:
             url = web.input()
             address = url['url']
 
-            if address[0:6] != "http://":
-            	address = "http://" + address
 
             page = requests.get(address)
             soup = BeautifulSoup(page.text)
@@ -229,6 +232,63 @@ class add:
             result,count = getAllData()
             render = web.template.render("/var/www/RTP/templates/")
             return render.add(str(e), "error", "True", session.user, result, count, session.instanceList, session.instanceSelected)
+class spider:
+    def GET(self):
+        result, count = getAllData()                
+        render = web.template.render("/var/www/RTP/templates/")
+        if logged():
+            return render.add("", "", 'True', session.user, result, count, session.instanceList, session.instanceSelected)
+        else:
+            return render.login("warning", "You must login before you add data.")
+    def POST(self):
+         #Database connections
+        client = MongoClient()
+        db = client.RTP
+        url = web.input()
+        topLeveladdress = url['url']
+        try:
+            urlList = getURLList(topLeveladdress)
+        except:
+            result, count = getAllData()
+            render = web.template.render('/var/www/RTP/templates/') 
+            return render.add("Error on site map retrieval.", "error", "True", session.user, result, count, session.instanceList, session.instanceSelected)
+
+
+        for index, address in enumerate(urlList):
+            try:
+                title = ""
+                page = requests.get(address)
+                soup = BeautifulSoup(page.text)
+                t = soup.find('title')
+                [s.extract() for s in soup(['style', 'script', '[document]', 'head', 'title'])]
+                visible_text = soup.getText()
+                visible_text = os.linesep.join([s for s in visible_text.splitlines() if s])
+                visible_text = visible_text.replace("\n", " ")
+                title = t.text
+                document  = visible_text
+            except:
+                result, count = getAllData()
+                render = web.template.render('/var/www/RTP/templates/') 
+                if index > 1:
+                    result, count = getAllData()
+                    render = web.template.render('/var/www/RTP/templates/') 
+                    return render.add("Error on retrieval. Some documents may still have been collected. Please review.", "error", "True", session.user, result, count, session.instanceList, session.instanceSelected)
+
+            isDuplicate = checkDupURL(address)
+            if isDuplicate != True:
+                try:
+                    iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
+                    query = db.RTP.insert_one( { "url": address, "title" : title, "document" : document, "instanceID": iid['_id'] })
+                except Exception, e:
+                    result,count = getAllData()
+                    render = web.template.render("/var/www/RTP/templates/")
+                    return render.add(str(e), "error", "True", session.user, result, count, session.instanceList, session.instanceSelected)
+        #End of inserts
+        result, count = getAllData()
+        render = web.template.render('/var/www/RTP/templates/') 
+        return render.add("Success! We added a total of " + str(len(urlList)) + " documents to this instance." ,"success", "True", session.user, result, count, session.instanceList, session.instanceSelected)
+
+
 
 def convertArray(data):
     newList = [];
@@ -258,6 +318,29 @@ def getInstances():
 		session.instanceSelected = iList[0]
 
 	return iList
+
+def getURLList(address):
+    url = address
+    urls = [url] #urls to scrape
+    visited = [url] #record of urls already visited
+    while len(urls) > 0:
+        text = ""
+        try: 
+            text = urllib.urlopen(urls[0]).read()
+        except:
+            print urls[0] + ": This is broke "
+        soup = BeautifulSoup(text, "html.parser")
+
+        urls.pop(0)
+
+        for tag in soup.findAll('a', href=True):
+            if "#" not in tag['href']:
+                 tag['href'] = urlparse.urljoin(url, tag['href'],)
+                 if url in tag['href'] and tag['href'] not in visited:
+                    visited.append(tag['href'])
+
+    print len(visited)
+    return visited
 
 def checkDupURL(url):
     client = MongoClient()
