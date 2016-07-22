@@ -1,11 +1,11 @@
 #researchDevAO - RTP 
-Curent Version - v1.3.5.2
+###Curent Version - v1.3.5.2
 A proof of concept for the research being done at The Ohio State University by Agustin Ortiz advised by Rajiv Ramnanth
 ##Real Time Presentation API
 The purpose of the software tool is to allow a user to pull up the most relevant piece of document data based on surrounding conversation data happening at a given moment. This gives users an opportunity to store web pages as document data, and retrieve those web pages based on some text interpreted as a conversation. The relevance of the document retrieval methods are being researched, validated, and tested by Agustin Ortiz.
 
 
-#Beta v1.0.1.1
+#Beta v1.3.5.2
 
 Two additional features: Instances & Spider Add.  Multiple Bug fixes, and just one thesis update.
 
@@ -14,6 +14,9 @@ Instances are now supported.  You can add & delete instances in which you can ad
 
 ###Spider Add
 A crawler was implemented into the add page.  Instead of adding just one page at a time, there is now the capability of adding multiple documents at one time.  The crawler will use the top level domain and also add any links included in that page from that same domain.  For example, www.osu.edu is submitted for a spider add.  The document is parsed for all href tags, then that list is truncated based on link that include osu.edu in them that way the subject is not effected.  This isn't optimized so the feature takes a while depending on the number of links.
+
+###UI Upgrades
+Added many new UI changes as features like modal windows & animations on form submissions.
 
 ###Bugs
 *Receive page doesn't load in fake data on the initial GET request
