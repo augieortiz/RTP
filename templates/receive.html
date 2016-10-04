@@ -1,4 +1,4 @@
-$def with (message, url, status, logged, user, data, instance)
+$def with (message, convo, url, status, logged, user, data, instance)
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,8 +11,10 @@ $def with (message, url, status, logged, user, data, instance)
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
     <link rel="stylesheet" href="static/font-awesome.css">
+    <link rel="stylesheet" href="static/animate.css">
     <link rel='shortcut icon' href='static/favicon.ico'>
     <script src="static/sorttable.js"></script>
+    <script src="static/receive.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-default">
@@ -41,28 +43,34 @@ $def with (message, url, status, logged, user, data, instance)
             </div>
         </div>
     </nav>
-    <div class="container">
-    <h3 class="text-center"><strong>Beta v1.3.5.2</strong></h3>
-       <h3>Receive Presentation Data</h3>
-       <h4>Current Instance: <span style="color: #b00"><strong>$instance</strong></span></h4>
-        <p>Enter any text, conversation, or transcript.  The MongoDB will be searched and queried to locate the most relevant presentation data.</p> 
-  		<form method="post" name="convoForm" onsubmit=" return validateForm()" action="receive">
-  		<textarea type="textarea" class="form-control" rows="5" name="conversation"></textarea> 
-  		<button class="btn btn-info form-control" type="submit" value="Find Presentation Data"> Find Presentation Data </button>
-  		</form>
-  		<br>
-  		$if status == 'success':
-  			<div class="alert alert-success" role="alert">
-  	  			<a href="#" class="alert-link">$message has been chosen as the presentation data.</a>
-  			</div>
-  		$if status == 'error':
-  			<div class="alert alert-danger" role="alert">
-  	  			<a href="#" class="alert-link">$message</a>
-  			</div>
-    </div>
     <div class="container-fluid">
-        <div class="row" style="height: 100%;">
-        <div class="col-sm-6">
+    <h3 class="text-center"><strong>Beta v1.3.5.2</strong></h3>
+      <div class="row" style="height: 100%;">
+       <div class="col-sm-6">
+        
+           <h3>Receive Presentation Data</h3>
+           <h4>Current Instance: <span style="color: #b00"><strong>$instance</strong></span></h4>
+           <div class="text-center">
+    	        <h4> Click to start Voice Recognition Loop</h4>
+    	        <span id="mic" class="fa-stack fa-2x">
+    	        <i id ="mic" class="fa fa-circle-thin fa-stack-2x"></i>
+    	        <i id="mic" class="mic fa fa-microphone fa-1x" aria-hidden="true"></i>
+    			</span>
+            </div>
+      		<form method="post" name="convoForm" onsubmit=" return validateForm()" action="receive">
+      		<textarea id="convo" type="textarea" class="form-control" rows="5" name="conversation"></textarea> 
+      		<button id="find" class="btn btn-default form-control" type="submit" value="Find Presentation Data"> Find Presentation Data </button>
+      		</form>
+      		<br>
+      		$if status == 'success':
+      			<h2>Query Search: $convo</h2>
+      			<div class="alert alert-success" role="alert">
+      	  			<a href="#" class="alert-link">$message has been chosen as the presentation data.</a>
+      			</div>
+      		$if status == 'error':
+      			<div class="alert alert-danger" role="alert">
+      	  			<a href="#" class="alert-link">$message</a>
+      			</div>
              <div class="panel panel-default">
               <div class="panel-heading" style="color: white; background-color: #b00">Search Results</div>
               <div class="table-responsive">
@@ -98,10 +106,10 @@ $def with (message, url, status, logged, user, data, instance)
               </div>
             </div>
           <div class="col-sm-6">
+          <h3>Result</h3>
                 <iframe id="frameDemo" name="frameDemo" src="$url" style="width: 100%; height: 100vh "> </iframe>
           </div>
         </div>
-
     </div>
 </div>
   </div>
@@ -125,5 +133,6 @@ function validateForm()
 
 var newTableObject = document.getElementById("#results")
 sorttable.makeSortable(newTableObject);
+
 
  </script>

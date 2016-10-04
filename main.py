@@ -33,7 +33,7 @@ urls = (
         '/documentd', 'documentd', 
         '/spider', 'spider'
 )
-web.config.debug = False
+web.config.debug = True
 
 app = web.application(urls, globals())
 application = app.wsgifunc()
@@ -104,7 +104,7 @@ class receive:
     def GET(self):
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
-    			return render.receive("", "/ThisIsNotTheDataYouAreLookingFor", "first", "True", session.user, "", session.instanceSelected)
+    			return render.receive("", "", "/ThisIsNotTheDataYouAreLookingFor", "first", "True", session.user, "", session.instanceSelected)
             else:
                 return render.login("warning", "You must login before you receive data.")
     def POST(self):
@@ -122,9 +122,9 @@ class receive:
                     return render.receive("Looks like you there was no data found...Try again maybe.", "/ThisIsNotTheDataYouAreLookingFor", "error", "True", session.user, "notfound", session.instanceSelected)
                 else:
                     present = data[0][index] 
-                    return render.receive("We found the presentation data of:  " + present, present, "success", "True", session.user, newdata, session.instanceSelected)
+                    return render.receive("We found the presentation data of:  " "" + present, search, present, "success", "True", session.user, newdata, session.instanceSelected)
             except Exception,e:
-                return render.receive("Looks like you there was no data found...Try again maybe.", "Error on data retrieval", "error", "True", session.user, "notfound", session.instanceSelected)
+                return render.receive("Looks like you there was no data found...Try again maybe.", "", "Error on data retrieval", "error", "True", session.user, "notfound", session.instanceSelected)
 
 class documentd:
     def POST(self):
@@ -164,16 +164,20 @@ class instanced:
             db = client.RTP
             render = web.template.render("/var/www/RTP/templates/")
             #insert new instance - username hard coded at the moment
-            iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
-            deleteDocuemnts = db.RTP.remove( { "instanceID": iid['_id'] })
-            query = db.Instances.delete_one( {"username" : session.user, "topic": dele['deleteInstance']})
-            instances = getInstances()
-            session.instanceList = instances
-            session.instanceSelected = instances[0]
-            if logged():
+            try:
+                iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
+                deleteDocuemnts = db.RTP.remove( { "instanceID": iid['_id'] })
+                query = db.Instances.delete_one( {"username" : session.user, "topic": dele['deleteInstance']})
+                instances = getInstances()
+                session.instanceList = instances
+                session.instanceSelected = instances[0]
+                if logged():
+                    raise web.seeother('/add')
+                else:
+                    return render.login("warning", "You must login before you add data.")
+            except Exception,e:
                 raise web.seeother('/add')
-            else:
-                return render.login("warning", "You must login before you add data.")
+
 class instancec:
     def POST(self):
             selection = web.input()
@@ -189,7 +193,11 @@ class add:
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
                 result, count = getAllData()
-                return render.add("", "", 'True', session.user, result, count, session.instanceList, session.instanceSelected)
+                if(result != "Empty"):
+                    return render.add("", "", 'True', session.user, result, count, session.instanceList, session.instanceSelected)
+                else:
+                    emptyList = [];
+                    return render.add("", "", 'True', session.user, result, count, emptyList, session.instanceSelected)
             else:
                 return render.login("warning", "You must login before you add data.")
     def POST(self):
@@ -301,21 +309,26 @@ def getAllData():
     #Database connections
     client = MongoClient()
     db = client.RTP
-    iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
-    query = db.RTP.find( {"instanceID" : iid['_id']}, {"title": -1 })
-    return query, query.count()
+    try:
+        iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
+        query = db.RTP.find( {"instanceID" : iid['_id']}, {"title": -1 })
+        return query, query.count()
+    except Exception, e:
+        #Error on query, return 0
+        return "Empty", 0;
+    
 
 def getInstances():
 
-	iList = []
-	client = MongoClient()
-	db = client.RTP
-	query = db.Instances.find( {"username" : session.user }, {"topic" : -1})
-	for index,item in enumerate(query):
-		iList.append(item['topic'])
-
-	if session.instanceSelected == 'none':
-		session.instanceSelected = iList[0]
+    iList = []
+    client = MongoClient()
+    db = client.RTP
+    query = db.Instances.find( {"username" : session.user }, {"topic" : -1})
+    if query.count() > 0:
+    	for index,item in enumerate(query):
+    		iList.append(item['topic'])
+    	if session.instanceSelected == 'none':
+    		session.instanceSelected = iList[0]
 
 	return iList
 
@@ -445,7 +458,7 @@ def logged():
     ###
 def notfound():
     render = web.template.render("/var/www/RTP/templates/")
-    return web.notfound(render.notfound("This is not the page you're looking for..."));
+    return web.notfound(render.notfound("Page not found..."));
 
     # You can use template result like below, either is ok:
     #return web.notfound(render.notfound())

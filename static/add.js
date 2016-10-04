@@ -1,4 +1,5 @@
 $( document ).ready(function() {
+
     $( "#deleteButton" ).click(function() {
      var sel = $("#instances option:selected").text();
      console.log(sel)
