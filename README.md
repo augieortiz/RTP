@@ -1,9 +1,18 @@
 #researchDevAO - RTP 
-###Curent Version - v1.3.5.2
+
+###Curent Version - v1.4.1
 A proof of concept for the research being done at The Ohio State University by Agustin Ortiz advised by Rajiv Ramnanth
 ##Real Time Presentation API
 The purpose of the software tool is to allow a user to pull up the most relevant piece of document data based on surrounding conversation data happening at a given moment. This gives users an opportunity to store web pages as document data, and retrieve those web pages based on some text interpreted as a conversation. The relevance of the document retrieval methods are being researched, validated, and tested by Agustin Ortiz.
 
+#Beta v1.4.1
+
+One additional featureL: Voice Recognition.  One bug fix on empty instances in an account.  Updated thesis page to reflect google doc status
+
+###Voice Recognition
+The voice recognition feature is only available in CHROME.  Unfortunatly the client side solution was much more feasable than sending flac files over to the web server for voice recognition.  This leverages the Speech recognition API and uses js functions to put the voice recognition into the text area form input.  This is currently being tested and is still in Beta.
+
+*Minor bug fix: New accounts with zero added instances do not fail to open the add page aymore.
 
 #Beta v1.3.5.2
 
