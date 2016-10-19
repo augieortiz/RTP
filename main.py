@@ -22,8 +22,8 @@ from bson.objectid import ObjectId
 
 urls = (
        '/', 'index',
-       	'/receive', 'receive',
-		'/add', 'add',
+        '/receive', 'receive',
+        '/add', 'add',
         '/thesis', 'thesis',
         '/login', 'login',
         '/logout', 'Kill',
@@ -42,7 +42,7 @@ db = web.database(dbn='mysql', user='root', pw='Augie03!', db='dbRTP')
 
 
 store = web.session.DBStore(db, 'sessions')
-session = web.session.Session(app, store, initializer={'login': 0,'privilege': 0,'user':'anonymous', 'instanceSelected': 'none',  'instanceList': []})
+session = web.session.Session(app, store, initializer={'login': 0,'privilege': 0,'user':'anonymous', 'instanceSelected': 'none',  'instanceList': [], 'lastVisted': '/ThisIsNotTheDataYouAreLookingFor'})
 
 class index:
     def GET(self):
@@ -104,7 +104,7 @@ class receive:
     def GET(self):
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
-    			return render.receive("", "", "/ThisIsNotTheDataYouAreLookingFor", "first", "True", session.user, "", session.instanceSelected)
+                return render.receive("", "", "/ThisIsNotTheDataYouAreLookingFor", "first", "True", session.user, "", session.instanceSelected)
             else:
                 return render.login("warning", "You must login before you receive data.")
     def POST(self):
@@ -119,12 +119,13 @@ class receive:
             newdata = sorted(newdata, key=lambda x: x[1], reverse=True)
             try:
                 if not data[1]:
-                    return render.receive("Looks like you there was no data found...Try again maybe.", "/ThisIsNotTheDataYouAreLookingFor", "error", "True", session.user, "notfound", session.instanceSelected)
+                    return render.receive("Looks like you there was no data found...Try again maybe.", session.lastVisted, "error", "True", session.user, "notfound", session.instanceSelected)
                 else:
+                    session.lastVisted = data[0][index];
                     present = data[0][index] 
                     return render.receive("We found the presentation data of:  " "" + present, search, present, "success", "True", session.user, newdata, session.instanceSelected)
             except Exception,e:
-                return render.receive("Looks like you there was no data found...Try again maybe.", "", "Error on data retrieval", "error", "True", session.user, "notfound", session.instanceSelected)
+                return render.receive("Looks like you there was no data found...Try again maybee.", "", session.lastVisted, "error", "True", session.user, "notfound", session.instanceSelected)
 
 class documentd:
     def POST(self):
@@ -229,7 +230,7 @@ class add:
                 render = web.template.render("/var/www/RTP/templates/")
                 return render.add(url, "error", "True", session.user, result, count, session.instanceList, session.instanceSelected)
             else:
-            	iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
+                iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
                 query = db.RTP.insert_one( { "url": address, "title" : title, "document" : document, "instanceID": iid['_id'] })
                 result, count = getAllData()
                 render = web.template.render('/var/www/RTP/templates/') 
@@ -325,12 +326,12 @@ def getInstances():
     db = client.RTP
     query = db.Instances.find( {"username" : session.user }, {"topic" : -1})
     if query.count() > 0:
-    	for index,item in enumerate(query):
-    		iList.append(item['topic'])
-    	if session.instanceSelected == 'none':
-    		session.instanceSelected = iList[0]
+        for index,item in enumerate(query):
+            iList.append(item['topic'])
+        if session.instanceSelected == 'none':
+            session.instanceSelected = iList[0]
 
-	return iList
+    return iList
 
 def getURLList(address):
     url = address
@@ -397,9 +398,9 @@ def searchDatbaseRake(db, keywords):
     keywords = keywords.most_common(25)
     for x in range (0,len(keywords)):
         try:
-        	iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
-        	ident = iid['_id']
-    		result = db.RTP.aggregate( [ { "$match": { "$text": { "$search": keywords[x][0] }, "instanceID" : ObjectId(ident) }  },  { "$project": { "url": -1, "_id": 0, "score": { "$meta": "textScore" } } }, { "$match": {  "score": {  "$gt": 1 } } } ])
+            iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
+            ident = iid['_id']
+            result = db.RTP.aggregate( [ { "$match": { "$text": { "$search": keywords[x][0] }, "instanceID" : ObjectId(ident) }  },  { "$project": { "url": -1, "_id": 0, "score": { "$meta": "textScore" } } }, { "$match": {  "score": {  "$gt": 1 } } } ])
         except RuntimeError:
             print "Search has failed with keywords : " + keywords[x][0] + ". Retrying with next keyword."
         for document in result:
