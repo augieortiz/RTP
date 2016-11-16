@@ -11,7 +11,7 @@ $def with (logged, user)
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
         <link href="static/favicon.ico" rel="icon" type="image/x-icon" />
     </head>
-    <body>
+    <body style="background-color: #eeeeee">
        <nav class="navbar navbar-inverse">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -26,6 +26,7 @@ $def with (logged, user)
                     <ul class="nav navbar-nav navbar-collapse">
                         <li><a href="/add">Add Data</a></li>
                         <li><a href="/receive">Receive Data</a></li>
+                        <li><a href="/results">Test Results</a></li>
                         <li class="active"><a href="/thesis">Thesis</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
@@ -39,14 +40,12 @@ $def with (logged, user)
             </div>
         </nav>
         <div class="container">
-            <div class="page-header">
-            <h3 class="text-center"><strong>Beta v1.4.1</strong></h3>
-                <h1>Thesis<small> Running document and thought process for all thesis work.</small></h1>
-            </div>
-            <div class="embed-responsive embed-responsive-16by9">
-  <iframe class="embed-responsive-item" src="https://docs.google.com/document/d/1DUrrcOCnGHifywx0JSogITJLrOBJ4ut74YCIhnNfhFI/pub?embedded=true"></iframe>
+        <div align="center">
+  <iframe class="googleDoc visible-lg" style="width:680px; height:860px;" frameborder="0" src="https://docs.google.com/document/d/1DUrrcOCnGHifywx0JSogITJLrOBJ4ut74YCIhnNfhFI/pub?embedded=true"></iframe>
+  <div class="hidden-lg"><h1>Not available on mobiel devices...email Agustin for copy of Thesis.</h1></div>
 			</div>
 
+		</div>
         </div>
     </body>
 </html>

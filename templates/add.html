@@ -13,7 +13,7 @@ $def with (message, status, logged, user, result, count, instances, selected)
    <script src="static/add.js"></script>
 </head>
 <body>
-  <nav class="navbar navbar-default">
+  <nav class="navbar navbar-inverse">
             <div class="container-fluid">
                 <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -27,6 +27,7 @@ $def with (message, status, logged, user, result, count, instances, selected)
                     <ul class="nav navbar-nav navbar-collapse">
                         <li class="active"><a href="/add">Add Data</a></li>
                         <li><a href="/receive">Receive Data</a></li>
+                        <li><a href="/results">Test Results</a></li>
                         <li><a href="/thesis">Thesis</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
@@ -40,130 +41,154 @@ $def with (message, status, logged, user, result, count, instances, selected)
             </div>
   </nav>
   <div class="container">
-      <h3 class="text-center"><strong>Beta v1.4.1</strong></h3>
-      <h3>Add new URL</h3>
-      <p>Enter a valid URL.  The page will be scraped and stored in the MongoDB as a presentation data</p> 
-      <p style="color: red; font-size: 80%;">*Current version <strong>supports </strong> multiple instances for testing.</p>
-      <label for="sel1">Select Instance:</label>
-      <div class="row">
-          <div class="col-md-5">
-         <form method="POST" action="instancec">
-              <select name="selInt" id="instances" class="form-control" id="sel1" onchange="this.form.submit()">  
-                  $for index,item in enumerate(instances):
-                      $if item == selected:
-                          <option selected value="$item">$item</option>
-                      $else:
-                          <option value="$item">$item</option>
-              </select>
-          </form>
-          </div>
-          <div class="col-md-1">
-            <div class="btn-group">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Action <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a data-toggle='modal' data-target="#addInstance" href="#">Add New Instance</a></li>
-                  <li id="deleteButton"><a data-toggle='modal' data-target="#confirm-delete" href="#">Delete Instance</a></li>
-                  <li role="separator" class="divider"></li>
-                  <li><a href="#">Help</a></li>
-                </ul>
-              </div>
-        </div>
-      </div>
-      <div id="addInstance" class="modal fade" role="dialog">
-          <div class="modal-dialog">
-              <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Add New Instance</h4>
-                  </div>
-                  <form method="POST" action="instance">
-                    <div class="modal-body">
-                        <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon1">New Instance Name</span>
-                            <input name="newInstance" type="text" class="form-control" placeholder="Instance Name" aria-describedby="basic-addon1">
-                        </div>
-                    </div>
-                    <div class="modal-footer">    
-                            <button type="submit" class="btn btn-default">Submit</button>
-                    </div>
-                  </form>
-              </div>
-          </div>
-      </div>
-      <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                Confirm Instance Deletion            </div>
-            <form method="POST" action="instanced">
-              <div class="modal-body">
-              This will delete the instance, <strong><span style="color: red;" id="SI"/></strong> and all it's associated data.
-              </div>
-              <input hidden name="deleteInstance" id="inputSI" type="text"/>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                  <button type="submit" class="btn btn-danger btn-ok">Delete</button>
-              </div>
+      <div class="row" style="height: 100%;">
+        <div class="col-sm-6">
+        <h3>Add new URL</h3>
+        <label for="sel1">Select Instance:</label>
+        <div class="row">
+            <div class="col-md-9">
+           <form method="POST" action="instancec">
+                <select name="selInt" id="instances" class="form-control" id="sel1" onchange="this.form.submit()">  
+                    $for index,item in enumerate(instances):
+                        $if item == selected:
+                            <option selected value="$item">$item</option>
+                        $else:
+                            <option value="$item">$item</option>
+                </select>
             </form>
-        </div>
-    </div>
-</div>
-  <br>
-  <div>
-      <form name="addURL"  method="post" action="add"  onsubmit=" return validateForm()" >
-      <div class="input-group">
-          <span class="input-group-addon" id="basic-addon1">Single Add</span>
-          <input id="url" class="form-control"  placeholder="Enter URL" type="text" name="url" /> 
-         </div>
-          <input type="submit" value="Add" class="form-control btn btn-default" />
-      </form>
-      <br>
-      <form name="addSpiderURL" id="addSpiderURL" method="post" action="spider"  onsubmit=" return validateSpiderForm()" >
-        <div class="input-group">
-            <span class="input-group-addon" id="basic-addon1">Batch Add</span>
-            <input id="url" class="form-control"  placeholder="Enter URL" type="text" name="url" /> 
+            </div>
+            <div class="col-md-1">
+              <div class="btn-group">
+                  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Action <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a data-toggle='modal' data-target="#addInstance" href="#">Add New Instance</a></li>
+                    <li id="deleteButton"><a data-toggle='modal' data-target="#confirm-delete" href="#">Delete Instance</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#">Help</a></li>
+                  </ul>
+                </div>
           </div>
-            <button id="btnSpider" data-toggle="tooltip" title="Use this button to add the first level links of a page." type="submit" value="Spider" class="form-control btn btn-default">
-              <span id="spinner"class="hidden glyphicon glyphicon-refresh spinning"></span> Spider
-            </button>
-      </form>
-      <p style="color: red; font-size: 80%;">*The spider function could take a few moments depending on the size of the site entered.</p>
+        </div>
+        <div id="addInstance" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Add New Instance</h4>
+                    </div>
+                    <form method="POST" action="instance">
+                      <div class="modal-body">
+                          <div class="input-group">
+                              <span class="input-group-addon" id="basic-addon1">New Instance Name</span>
+                              <input name="newInstance" type="text" class="form-control" placeholder="Instance Name" aria-describedby="basic-addon1">
+                          </div>
+                      </div>
+                      <div class="modal-footer">    
+                              <button type="submit" class="btn btn-default">Submit</button>
+                      </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  Confirm Instance Deletion            </div>
+              <form method="POST" action="instanced">
+                <div class="modal-body">
+                This will delete the instance, <strong><span style="color: red;" id="SI"/></strong> and all it's associated data.
+                </div>
+                <input hidden name="deleteInstance" id="inputSI" type="text"/>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger btn-ok">Delete</button>
+                </div>
+              </form>
+          </div>
+      </div>
   </div>
-  <br>
-    $if status == 'success':
-        <div class="alert alert-success" role="alert">
-          <a href="#" class="alert-link">$message</a>
+    <br>
+    <div>
+        <form name="addURL"  method="post" action="add"  onsubmit=" return validateForm()" >
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">Single Add</span>
+            <input id="url" class="form-control"  placeholder="Enter URL" type="text" name="url" /> 
+           </div>
+            <input type="submit" value="Add" class="form-control btn btn-default" />
+        </form>
+        <br>
+        <form name="addSpiderURL" id="addSpiderURL" method="post" action="spider"  onsubmit=" return validateSpiderForm()" >
+          <div class="input-group">
+              <span class="input-group-addon" id="basic-addon1">Batch Add</span>
+              <input id="url" class="form-control"  placeholder="Enter URL" type="text" name="url" /> 
+            </div>
+              <button id="btnSpider" data-toggle="tooltip" title="Use this button to add the first level links of a page." type="submit" value="Spider" class="form-control btn btn-default">
+                <span id="spinner"class="hidden glyphicon glyphicon-refresh spinning"></span> Spider
+              </button>
+        </form>
+        <p style="color: red; font-size: 80%;">*The spider function could take a few moments depending on the size of the site entered.</p>
+        <br>
+         <form name="addCustomURL" id="addCustomURL" method="post" action="custom"  >
+          <div class="input-group">
+              <span class="input-group-addon" id="basic-addon1">Title</span>
+              <input id="customTitle" class="form-control"  placeholder="Enter Title" type="text" name="customTitle" />
+            </div>
+            <div class="input-group">
+  	          <span class="input-group-addon" id="basic-addon1">Document</span>
+  	          <textarea id="customDocument" class="form-control"  placeholder="Document Text" type="textarea" name="customDocument"></textarea>  
+           </div>
+              <button id="btnCustom" data-toggle="tooltip" title="Use this button to add a custom document." type="submit" value="Custom" class="form-control btn btn-default">
+                <span id="spinner"class="hidden glyphicon glyphicon-refresh spinning"></span> Custom Add
+              </button>
+        </form>
+        
+    </div>
+    <br>
+      $if status == 'success':
+          <div class="alert alert-success" role="alert">
+            <a href="#" class="alert-link">$message</a>
+          </div>
+      $if status == '':
+          <div></div>
+      $if status == 'error':
+          <div class="alert alert-danger" role="alert">
+            <a href="#" class="alert-link">$message</a>
+          </div>
         </div>
-    $if status == '':
-        <div></div>
-    $if status == 'error':
-        <div class="alert alert-danger" role="alert">
-          <a href="#" class="alert-link">$message</a>
-        </div>
-      <div class="panel panel-default">
-      <div class="panel-heading">Current Instance Database Collection: $count documents </div>
-        <table class="table table-hover">
-          <tbody>
-          $if result != 'Empty':
-            $for index,item in enumerate(result):
-                <tr>
-                  <td>
-                    <span class="glyphicon glyphicon-file"></span>
-                      $item['title']
-                  </td>
-                  <td class="text-right text-nowrap">
-                    <button class="btn btn-xs btn-info">HTML</button>
-                    <button onclick="confirmDelete(&#39;$item['_id']&#39;)" id="$item['_id']" class="btn btn-xs btn-danger">
-                      <span class="glyphicon glyphicon-trash"></span>
+      <div class="col-sm-6">
+      <h3>Documents</h3>
+        <div class="panel panel-default">
+        <div class="panel-heading">Current Instance Database Collection: $count documents </div>
+          <table class="table table-hover">
+            <tbody>
+            $if result != 'Empty':
+              $for index,item in enumerate(result):
+                  <tr>
+                    <td>
+                      <span data-toggle="tooltip" title="$item['document']" class="glyphicon glyphicon-file"></span>
+                      $if item['type'] != 'html':
+                        <a href="/custom?title=$item['title']&document=$item['document']">$item['title']</a>
+                      $else:
+                        <a href="$item['url']">$item['title']</a>
+                    </td>
+                    <td class="text-right text-nowrap">
+                    $if item['type'] == 'html':
+                      <button class="btn btn-xs btn-info">HTML</button>
+                    $else:
+                    	<button class="btn btn-xs btn-default">Custom</button>
+                      <button onclick="confirmDelete(&#39;$item['_id']&#39;)" id="$item['_id']" class="btn btn-xs btn-danger">
+                        <span class="glyphicon glyphicon-trash"></span>
+                        </button>
+                        <form><button hidden text="Delete" value="$item['_id']" type="submit" formmethod="post" formaction="documentd" name="dataDocument" id="cd$item['_id']" class="hidden btn btn-xs btn-danger">Delete</button></form>
                       </button>
-                      <form><button hidden text="Delete" value="$item['_id']" type="submit" formmethod="post" formaction="documentd" name="dataDocument" id="cd$item['_id']" class="hidden btn btn-xs btn-danger">Delete</button></form>
-                    </button>
-                  </td>
-                </tr>
-          </tbody>
-        </table>
+                    </td>
+                  </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
   </div>
 </body>

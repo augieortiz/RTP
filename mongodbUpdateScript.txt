@@ -1,0 +1,3 @@
+db.RTP.update({}, 
+            {$set : {"type": "html" } },
+            {upsert: false, multi:true});

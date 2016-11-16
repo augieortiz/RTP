@@ -31,7 +31,10 @@ urls = (
         '/instanced', 'instanced',
         '/instancec', 'instancec',
         '/documentd', 'documentd', 
-        '/spider', 'spider'
+        '/spider', 'spider',
+        '/custom', 'custom',
+        '/results', 'results',
+        '/welcome', 'welcome'
 )
 web.config.debug = True
 
@@ -104,7 +107,7 @@ class receive:
     def GET(self):
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
-                return render.receive("", "", "/ThisIsNotTheDataYouAreLookingFor", "first", "True", session.user, "", session.instanceSelected)
+                return render.receive("", "", "/welcome", "first", "True", session.user, "", session.instanceSelected)
             else:
                 return render.login("warning", "You must login before you receive data.")
     def POST(self):
@@ -115,18 +118,28 @@ class receive:
             keywords = watsonProcess(search)
             data, index = searchDatbaseRake(db, keywords)
             render = web.template.render('/var/www/RTP/templates/')
-            newdata = convertArray(data)
+            newdata = convertArray(data, search)
             newdata = sorted(newdata, key=lambda x: x[1], reverse=True)
+
             try:
                 if not data[1]:
+                    db.insert('SearchResults', session_id=session.session_id, score="", currentInstance=session.instanceSelected, searchQuery=search, found=0)
                     return render.receive("Looks like you there was no data found...Try again maybe.", session.lastVisted, "error", "True", session.user, "notfound", session.instanceSelected)
                 else:
                     session.lastVisted = data[0][index];
                     present = data[0][index] 
-                    return render.receive("We found the presentation data of:  " "" + present, search, present, "success", "True", session.user, newdata, session.instanceSelected)
+                    return render.receive("We found the presentation data of:  " + data[3][index], search, present, "success", "True", session.user, newdata, session.instanceSelected)
             except Exception,e:
+                db = web.database(dbn='mysql', user='root', pw='Augie03!', db='dbRTP')
+                db.insert('SearchResults', session_id=session.session_id, score="", currentInstance=session.instanceSelected, searchQuery=search, found=0)
                 return render.receive("Looks like you there was no data found...Try again maybee.", "", session.lastVisted, "error", "True", session.user, "notfound", session.instanceSelected)
 
+class results:
+    def GET(self):
+        myvar = dict(session=session.session_id)
+        results = db.select('SearchResults', myvar, where="session_id=$session")
+        render = web.template.render("/var/www/RTP/templates/")
+        return render.results(results)
 class documentd:
     def POST(self):
 
@@ -183,6 +196,7 @@ class instancec:
     def POST(self):
             selection = web.input()
             session.instanceSelected = selection['selInt']
+            session.lastVisted = "/welcome"
             result, count = getAllData()                
 
             if logged():
@@ -231,7 +245,7 @@ class add:
                 return render.add(url, "error", "True", session.user, result, count, session.instanceList, session.instanceSelected)
             else:
                 iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
-                query = db.RTP.insert_one( { "url": address, "title" : title, "document" : document, "instanceID": iid['_id'] })
+                query = db.RTP.insert_one( { "url": address, "type": "html", "title" : title, "document" : document, "instanceID": iid['_id'] })
                 result, count = getAllData()
                 render = web.template.render('/var/www/RTP/templates/') 
                 return render.add("Success.  The site: " + title + " has been added into the database.", "success", "True", session.user, result, count, session.instanceList, session.instanceSelected)
@@ -287,7 +301,7 @@ class spider:
             if isDuplicate != True:
                 try:
                     iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
-                    query = db.RTP.insert_one( { "url": address, "title" : title, "document" : document, "instanceID": iid['_id'] })
+                    query = db.RTP.insert_one( { "url": address, "type": "html", "title" : title, "document" : document, "instanceID": iid['_id'] })
                 except Exception, e:
                     result,count = getAllData()
                     render = web.template.render("/var/www/RTP/templates/")
@@ -297,13 +311,46 @@ class spider:
         render = web.template.render('/var/www/RTP/templates/') 
         return render.add("Success! We added a total of " + str(len(urlList)) + " documents to this instance." ,"success", "True", session.user, result, count, session.instanceList, session.instanceSelected)
 
+class custom:
+    def GET(self):
+        data = web.input(title="no data", document="no data")
+        render = web.template.render('/var/www/RTP/templates/')
+        return render.custom(data.title, data.document, session.session_id)
+
+class welcome:
+    def GET(self):
+        render = web.template.render('/var/www/RTP/templates/')
+        return render.welcome()
+
+    def POST(self):
+        client = MongoClient()
+        db = client.RTP
+        custom = web.input()
+
+        document = custom['customDocument']
+        title = custom['customTitle']
+
+        try:
+            iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
+            query = db.RTP.insert_one( { "url": "", "type": "custom", "title" : title, "document" : document, "instanceID": iid['_id'] })
+            result, count = getAllData()
+            render = web.template.render('/var/www/RTP/templates/') 
+            return render.add("Success.  The document: " + title + " has been added into the database.", "success", "True", session.user, result, count, session.instanceList, session.instanceSelected)
+        except Exception, e:
+            result,count = getAllData()
+            render = web.template.render("/var/www/RTP/templates/")
+            return render.add(str(e), "error", "True", session.user, result, count, session.instanceList, session.instanceSelected)
 
 
-def convertArray(data):
+
+def convertArray(data, search):
     newList = [];
     for count,row in enumerate(data[0]):
-        newTup = (data[0][count], data[1][count], data[2][count])
-        newList.append(newTup) 
+        if data[0][count] == "":
+            data[0][count] = "/custom" + "?title=" + data[3][count] + "&document=" + data[4][count]
+        newTup = (data[0][count], data[1][count], data[2][count], data[3][count], data[4][count])
+        newList.append(newTup)
+        db.insert('SearchResults', session_id=session.session_id, currentInstance=session.instanceSelected, searchQuery=search, title=data[3][count], score=float(data[1][count]), keyword=data[2][count], document=data[4][count], found=1) 
     return newList 
 
 def getAllData():
@@ -312,7 +359,7 @@ def getAllData():
     db = client.RTP
     try:
         iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
-        query = db.RTP.find( {"instanceID" : iid['_id']}, {"title": -1 })
+        query = db.RTP.find( {"instanceID" : iid['_id']}, {"title": -1, "type": -1, "document": -1, "url": -1})
         return query, query.count()
     except Exception, e:
         #Error on query, return 0
@@ -395,18 +442,22 @@ def searchDatbaseRake(db, keywords):
     searchData.append([])
     searchData.append([])
     searchData.append([])
+    searchData.append([])
+    searchData.append([])
     keywords = keywords.most_common(25)
     for x in range (0,len(keywords)):
         try:
             iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
             ident = iid['_id']
-            result = db.RTP.aggregate( [ { "$match": { "$text": { "$search": keywords[x][0] }, "instanceID" : ObjectId(ident) }  },  { "$project": { "url": -1, "_id": 0, "score": { "$meta": "textScore" } } }, { "$match": {  "score": {  "$gt": 1 } } } ])
+            result = db.RTP.aggregate( [ { "$match": { "$text": { "$search": keywords[x][0] }, "instanceID" : ObjectId(ident) }  },  { "$project": { "url": -1, "title": -1, "document": -1, "_id": 0, "score": { "$meta": "textScore" } } }, { "$match": {  "score": {  "$gt": 1 } } } ])
         except RuntimeError:
             print "Search has failed with keywords : " + keywords[x][0] + ". Retrying with next keyword."
         for document in result:
             searchData[0].append(str(document['url']))
             searchData[1].append(document['score'])
             searchData[2].append(keywords[x][0])
+            searchData[3].append(document['title'].encode('ascii', 'ignore'))
+            searchData[4].append((document['document']))
     if not searchData[0]:
         print "No results found..."
         return searchData, 0

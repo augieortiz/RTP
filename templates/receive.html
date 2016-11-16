@@ -17,7 +17,7 @@ $def with (message, convo, url, status, logged, user, data, instance)
     <script src="static/receive.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-default">
+    <nav class="navbar navbar-inverse">
         <div class="container-fluid">
             <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -31,6 +31,7 @@ $def with (message, convo, url, status, logged, user, data, instance)
                 <ul class="nav navbar-nav navbar-collapse">
                     <li class=""><a href="/add">Add Data</a></li>
                     <li class="active"><a href="/receive">Receive Data</a></li>
+                    <li><a href="/results">Test Results</a></li>
                     <li><a href="/thesis">Thesis</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
@@ -44,35 +45,22 @@ $def with (message, convo, url, status, logged, user, data, instance)
         </div>
     </nav>
     <div class="container-fluid">
-    <h3 class="text-center"><strong>Beta v1.4.1</strong></h3>
       <div class="row" style="height: 100%;">
        <div class="col-sm-6">
-        
-           <h3>Receive Presentation Data</h3>
-           <h4>Current Instance: <span style="color: #b00"><strong>$instance</strong></span></h4>
-           <div class="text-center">
-    	        <h4>Voice Recognition Loop</h4>
-    	        <span id="mic" class="fa-stack fa-2x">
-    	        <i id ="mic" class="fa fa-circle-thin fa-stack-2x"></i>
-    	        <i id="mic" class="mic fa fa-microphone fa-1x" aria-hidden="true"></i>
-    			</span>
+            <div class="text-center">
+              <span id="mic" class="fa-stack fa-2x">
+              <i id ="mic" class="fa fa-circle-thin fa-stack-2x"></i>
+              <i id="mic" class="mic fa fa-microphone fa-1x" aria-hidden="true"></i>
+          </span>
+           <h4><span style="color: #b00"><strong>$instance</strong></span></h4>
             </div>
       		<form method="post" name="convoForm" onsubmit=" return validateForm()" action="receive">
       		<textarea id="convo" type="textarea" class="form-control" rows="5" name="conversation"></textarea> 
       		<button id="find" class="btn btn-default form-control" type="submit" value="Find Presentation Data"> Find Presentation Data </button>
       		</form>
       		<br>
-      		$if status == 'success':
-      			<h2>Query Search: $convo</h2>
-      			<div class="alert alert-success" role="alert">
-      	  			<a href="#" class="alert-link">$message has been chosen as the presentation data.</a>
-      			</div>
-      		$if status == 'error':
-      			<div class="alert alert-danger" role="alert">
-      	  			<a href="#" class="alert-link">$message</a>
-      			</div>
              <div class="panel panel-default">
-              <div class="panel-heading" style="color: white; background-color: #b00">Search Results</div>
+              <a href="/results"><div class="panel-heading" style="color: white; background-color: #b00">Search Results Table</div></a>
               <div class="table-responsive">
                   <table id="results" class="table sortable">
                     <thead>
@@ -87,7 +75,7 @@ $def with (message, convo, url, status, logged, user, data, instance)
                           $for count,result in enumerate(data):
                               <tr class="active">
                                   <th scope="row">${count+1}</th>
-                                  <td><a href="$data[count][0]" target="frameDemo">$data[count][0]</a></td>
+                                  <td><a href="$data[count][0]" target="frameDemo">$data[count][3]</a></td>
                                   <td>$data[count][1]</td>
                                   <td>$data[count][2]</td>
                               </tr> 
@@ -106,16 +94,25 @@ $def with (message, convo, url, status, logged, user, data, instance)
               </div>
             </div>
           <div class="col-sm-6">
-          <h3>Result</h3>
-                <iframe id="frameDemo" name="frameDemo" src="$url" style="width: 100%; height: 100vh "> </iframe>
+          $if status == 'success':
+            <h2>Query Search: $convo</h2>
+            <div class="alert alert-success" role="alert">
+                <a href="#" class="alert-link">$message has been chosen as the presentation data.</a>
+            </div>
+          $if status == 'error':
+            <div class="alert alert-danger" role="alert">
+                <a href="#" class="alert-link">$message</a>
+            </div>
+          <iframe class="animated slideInRight" id="frameDemo" name="frameDemo" src="$url" style="border: none; width: 100%; height: 100vh "> </iframe>
           </div>
         </div>
     </div>
 </div>
   </div>
+  <div id="#foo"></div>
 </body>
 </html>
-<script>
+  <script type="text/javascript">
 function validateForm()
 {
 
@@ -136,3 +133,4 @@ sorttable.makeSortable(newTableObject);
 
 
  </script>
+

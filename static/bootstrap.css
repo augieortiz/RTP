@@ -6962,3 +6962,20 @@ a.list-group-item-danger.active:focus {
 .mic {
   color: red;
 }
+
+
+
+.googleDoc {
+  text-align: center;
+  width: 85%;
+  height: 100%;
+  border: none;
+  margin-top: auto;
+}
+
+#frameDemo {
+  #yourElement {
+  -vendor-animation-duration: 3s;
+  -vendor-animation-delay: 1s;
+}
+}

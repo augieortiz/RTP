@@ -1,0 +1,78 @@
+$def with (result)
+<html lang="en">
+<head>
+  <title>DevAO - RTP Results</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="static/bootstrap.css">
+  <link rel='shortcut icon' href='static/favicon.ico'>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.12/b-1.2.2/datatables.min.css"/>
+<link rel "stylesheet" tyope="text/css" href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.dataTables.min.css"/>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.12/b-1.2.2/datatables.min.js"></script>
+<script type="text/javascript" src="static/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.0.3/js/buttons.html5.min.js"></script>
+   <script src="static/add.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span> 
+                </button>
+                    <a class="navbar-brand" href="/"><span style="font-size: 75%">research</span>DevAO</a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav navbar-collapse">
+                        <li><a href="/add">Add Data</a></li>
+                        <li><a href="/receive">Receive Data</a></li>
+                        <li class="active"><a href="/results">Test Results</a></li>
+                        <li><a href="/thesis">Thesis</a></li>
+                    </ul>
+                </div>
+            </div>
+  </nav>
+<div class="container">
+<h3> Results of current session
+              <div class="table-responsive">
+                  <table id="results" class="table sortable">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Instance</th>
+                        <th>Search Query</th>
+                        <th>Document Title</th>
+                        <th>Score</th>
+                        <th>Keyword</th>
+                      </tr>
+                      <tbody>
+                          $for count,result in enumerate(result):
+                              <tr class="active">
+                                  <th scope="row">${count+1}</th>
+                                  <td>$result.currentInstance</td>
+                                  <td>$result.searchQuery</td>
+                                  <td>$result.title</td>
+                                  <td>$result.score</td>
+                                  <td>$result.keyword</td>
+                              </tr> 
+
+                      </tbody>
+                    </thead>
+                  </table>
+                </div>
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+$$('#results').DataTable( {
+    buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+    ]
+} );
+</script>
