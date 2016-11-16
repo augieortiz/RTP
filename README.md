@@ -13,12 +13,14 @@ The purpose of the software tool is to allow a user to pull up the most relevant
 
 Every query ran against the mongoDB will be saved in our mySQL database. Each session will store every query result for testing purposes.  There is a new tab in the nav bar labled "Test Results."  We are still working on an export but the table does display for your convienence with functionality to sort and search results.
 
+Updates made to databases via script.  2 feilds added to mongoDB and entirely new table added to mysql
+
 Other chances included:
--Side by side design on the add page
--New addition to nav bar
--Newly designed presentation iFrame
--Plugin for table sorting and searching
--Newly designed thesis page for more of a document feel
+* Side by side design on the add page
+* New addition to nav bar
+* Newly designed presentation iFrame
+* Plugin for table sorting and searching
+* Newly designed thesis page for more of a document feel
 
 
 #Beta v1.4.1
