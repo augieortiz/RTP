@@ -53,7 +53,7 @@ class index:
             root = os.path.dirname(__file__) 
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
-                return render.index("True", session.user, _version)
+                return render.index("True", session.user)
             else:
                 return render.login("False", "", _version)
 class thesis:
@@ -67,7 +67,7 @@ class login:
     def GET(self):
          if logged():
             render = web.template.render("/var/www/RTP/templates/")
-            return render.index("already logged in", _version)
+            return render.index("already logged in", session.user)
          else:
             render = web.template.render("/var/www/RTP/templates/")
             return render.login("", "", _version)
