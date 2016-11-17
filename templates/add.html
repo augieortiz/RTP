@@ -170,7 +170,7 @@ $def with (message, status, logged, user, result, count, instances, selected)
                     <td>
                       <span data-toggle="tooltip" title="$item['document']" class="glyphicon glyphicon-file"></span>
                       $if item['type'] != 'html':
-                        <a href="/custom?title=$item['title']&document=$item['document']">$item['title']</a>
+                        <a href="/custom?_id=$item['_id']">$item['title']</a>
                       $else:
                         <a href="$item['url']">$item['title']</a>
                     </td>

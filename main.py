@@ -19,6 +19,7 @@ import urlparse
 import urllib
 from bson.objectid import ObjectId
 
+_version = '4.5.1.1'
 
 urls = (
        '/', 'index',
@@ -52,24 +53,24 @@ class index:
             root = os.path.dirname(__file__) 
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
-                return render.index("True", session.user)
+                return render.index("True", session.user, _version)
             else:
-                return render.login("False", "")
+                return render.login("False", "", _version)
 class thesis:
     def GET(self):
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
                 return render.thesis("True", session.user)
             else:
-                return render.login("alert", "This data is sensitive and therefore you must have credentials to view the thesis document.")
+                return render.login("alert", "This data is sensitive and therefore you must have credentials to view the thesis document.", _version)
 class login:
     def GET(self):
          if logged():
             render = web.template.render("/var/www/RTP/templates/")
-            return render.index("already logged in")
+            return render.index("already logged in", _version)
          else:
             render = web.template.render("/var/www/RTP/templates/")
-            return render.login("", "")
+            return render.login("", "", _version)
 
     def POST(self):
         name, passwd = web.input().email, web.input().password
@@ -77,7 +78,7 @@ class login:
             ident = db.select('Users', where='email=$name', vars=locals())[0]
         except IndexError:
             render = web.template.render("/var/www/RTP/templates/")
-            return render.login("error", "This is not an account with us. Please contact the admin to receive an account.")
+            return render.login("error", "This is not an account with us. Please contact the admin to receive an account.", _version)
         else:
             try:
                 if passwd == ident['pass']:
@@ -92,24 +93,24 @@ class login:
                     return render.index('True', session.user)
                 else:
                     render = web.template.render("/var/www/RTP/templates/")
-                    return render.login("error", "You have entered an invalid password. Try again.")
+                    return render.login("error", "You have entered an invalid password. Try again.", _version)
             except Exception, e:
                 render = web.template.render("/var/www/RTP/templates/")
-                return render.login("error", "Error on server" + "\n" + str(e))
+                return render.login("error", "Error on server" + "\n" + str(e), _version)
 class Kill:
     def GET(self):
         # Remove session data
         # And redirect the user to the main page
         session.kill()
         render = web.template.render("/var/www/RTP/templates/")
-        return  render.login("False", "")
+        return  render.login("False", "", _version)
 class receive:
     def GET(self):
             render = web.template.render("/var/www/RTP/templates/")
             if logged():
                 return render.receive("", "", "/welcome", "first", "True", session.user, "", session.instanceSelected)
             else:
-                return render.login("warning", "You must login before you receive data.")
+                return render.login("warning", "You must login before you receive data.", _version)
     def POST(self):
             convo = web.input()
             db = connectToDatabase()
@@ -152,7 +153,7 @@ class documentd:
             if logged():
                  raise web.seeother('/add')
             else:
-                return render.login("warning", "You must login before you add data.")
+                return render.login("warning", "You must login before you add data.", _version)
 
 class instance:
     def POST(self):
@@ -169,7 +170,7 @@ class instance:
             if logged():
                 raise web.seeother('/add')
             else:
-                return render.login("warning", "You must login before you add data.")
+                return render.login("warning", "You must login before you add data.", _version)
 class instanced:
     def POST(self):
 
@@ -188,7 +189,7 @@ class instanced:
                 if logged():
                     raise web.seeother('/add')
                 else:
-                    return render.login("warning", "You must login before you add data.")
+                    return render.login("warning", "You must login before you add data.", _version)
             except Exception,e:
                 raise web.seeother('/add')
 
@@ -202,7 +203,7 @@ class instancec:
             if logged():
                  raise web.seeother('/add')
             else:
-                return render.login("warning", "You must login before you add data.")
+                return render.login("warning", "You must login before you add data.", _version)
 class add:
     def GET(self):           
             render = web.template.render("/var/www/RTP/templates/")
@@ -214,7 +215,7 @@ class add:
                     emptyList = [];
                     return render.add("", "", 'True', session.user, result, count, emptyList, session.instanceSelected)
             else:
-                return render.login("warning", "You must login before you add data.")
+                return render.login("warning", "You must login before you add data.", _version)
     def POST(self):
         try:
            #Database connections
@@ -262,7 +263,7 @@ class spider:
         if logged():
             return render.add("", "", 'True', session.user, result, count, session.instanceList, session.instanceSelected)
         else:
-            return render.login("warning", "You must login before you add data.")
+            return render.login("warning", "You must login before you add data.", _version)
     def POST(self):
          #Database connections
         client = MongoClient()
@@ -313,14 +314,14 @@ class spider:
 
 class custom:
     def GET(self):
-        data = web.input(title="no data", document="no data")
+        client = MongoClient()
+        db = client.RTP
+        data = web.input()
+        docID = data._id
+        iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
+        result = db.RTP.find( {"instanceID" : iid['_id'], "_id": ObjectId(docID)}, {"title": -1, "type": -1, "document": -1, "url": -1})
         render = web.template.render('/var/www/RTP/templates/')
-        return render.custom(data.title, data.document, session.session_id)
-
-class welcome:
-    def GET(self):
-        render = web.template.render('/var/www/RTP/templates/')
-        return render.welcome()
+        return render.custom(result[0]['title'], result[0]['document'], session.session_id)
 
     def POST(self):
         client = MongoClient()
@@ -341,7 +342,10 @@ class welcome:
             render = web.template.render("/var/www/RTP/templates/")
             return render.add(str(e), "error", "True", session.user, result, count, session.instanceList, session.instanceSelected)
 
-
+class welcome:
+    def GET(self):
+        render = web.template.render('/var/www/RTP/templates/')
+        return render.welcome()
 
 def convertArray(data, search):
     newList = [];
