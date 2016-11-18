@@ -19,7 +19,7 @@ import urlparse
 import urllib
 from bson.objectid import ObjectId
 
-_version = '4.5.1.1'
+_version = '4.5.2.2'
 
 urls = (
        '/', 'index',
@@ -351,10 +351,10 @@ def convertArray(data, search):
     newList = [];
     for count,row in enumerate(data[0]):
         if data[0][count] == "":
-            data[0][count] = "/custom" + "?title=" + data[3][count] + "&document=" + data[4][count]
+            data[0][count] = "/custom" + "?_id=" + str(data[5][count])
         newTup = (data[0][count], data[1][count], data[2][count], data[3][count], data[4][count])
         newList.append(newTup)
-        db.insert('SearchResults', session_id=session.session_id, currentInstance=session.instanceSelected, searchQuery=search, title=data[3][count], score=float(data[1][count]), keyword=data[2][count], document=data[4][count], found=1) 
+        db.insert('SearchResults', session_id=session.session_id, currentInstance=session.instanceSelected, searchQuery=search, title=data[3][count], score=float(data[1][count]), keyword=data[2][count], document=data[4][count], found=1, url=data[0][count]) 
     return newList 
 
 def getAllData():
@@ -363,7 +363,7 @@ def getAllData():
     db = client.RTP
     try:
         iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
-        query = db.RTP.find( {"instanceID" : iid['_id']}, {"title": -1, "type": -1, "document": -1, "url": -1})
+        query = db.RTP.find( {"instanceID" : iid['_id']}, {"title": -1, "type": -1, "document": -1, "url": -1, "_id": -1})
         return query, query.count()
     except Exception, e:
         #Error on query, return 0
@@ -448,12 +448,13 @@ def searchDatbaseRake(db, keywords):
     searchData.append([])
     searchData.append([])
     searchData.append([])
+    searchData.append([])
     keywords = keywords.most_common(25)
     for x in range (0,len(keywords)):
         try:
             iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
             ident = iid['_id']
-            result = db.RTP.aggregate( [ { "$match": { "$text": { "$search": keywords[x][0] }, "instanceID" : ObjectId(ident) }  },  { "$project": { "url": -1, "title": -1, "document": -1, "_id": 0, "score": { "$meta": "textScore" } } }, { "$match": {  "score": {  "$gt": 1 } } } ])
+            result = db.RTP.aggregate( [ { "$match": { "$text": { "$search": keywords[x][0] }, "instanceID" : ObjectId(ident) }  },  { "$project": { "url": -1, "title": -1, "document": -1, "_id": -1, "score": { "$meta": "textScore" } } }, { "$match": {  "score": {  "$gt": 1 } } } ])
         except RuntimeError:
             print "Search has failed with keywords : " + keywords[x][0] + ". Retrying with next keyword."
         for document in result:
@@ -462,6 +463,7 @@ def searchDatbaseRake(db, keywords):
             searchData[2].append(keywords[x][0])
             searchData[3].append(document['title'].encode('ascii', 'ignore'))
             searchData[4].append((document['document']))
+            searchData[5].append((document['_id']))
     if not searchData[0]:
         print "No results found..."
         return searchData, 0
