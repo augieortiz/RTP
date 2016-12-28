@@ -11,6 +11,7 @@ $def with (message, status, logged, user, result, count, instances, selected)
   <link rel="stylesheet" href="static/bootstrap.css">
   <link rel='shortcut icon' href='static/favicon.ico'>
    <script src="static/add.js"></script>
+   <script src='//cdn.tinymce.com/4/tinymce.min.js'></script>
 </head>
 <body>
   <nav class="navbar navbar-inverse">
@@ -112,6 +113,18 @@ $def with (message, status, logged, user, result, count, instances, selected)
   </div>
     <br>
     <div>
+      <form name="addCustomURL" id="addCustomURL" method="post" action="custom"  >
+          <div class="input-group">
+          <span class="input-group-addon" id="basic-addon1">Slide</span>
+              <input id="customTitle" class="form-control"  placeholder="Enter Title" type="text" name="customTitle" />
+              <textarea id="customDocument" class="form-control"  placeholder="Document Text" type="textarea" name="customDocument"></textarea>  
+              <button id="btnCustom" data-toggle="tooltip" title="Use this button to add a custom document." type="submit" value="Custom" class="form-control btn btn-default">
+                <span id="spinner"class="hidden glyphicon glyphicon-refresh spinning"></span> Custom Add
+              </button>
+           </div>
+              
+        </form>
+        <br>
         <form name="addURL"  method="post" action="add"  onsubmit=" return validateForm()" >
         <div class="input-group">
             <span class="input-group-addon" id="basic-addon1">Single Add</span>
@@ -131,21 +144,7 @@ $def with (message, status, logged, user, result, count, instances, selected)
         </form>
         <p style="color: red; font-size: 80%;">*The spider function could take a few moments depending on the size of the site entered.</p>
         <br>
-         <form name="addCustomURL" id="addCustomURL" method="post" action="custom"  >
-          <div class="input-group">
-              <span class="input-group-addon" id="basic-addon1">Title</span>
-              <input id="customTitle" class="form-control"  placeholder="Enter Title" type="text" name="customTitle" />
-            </div>
-            <div class="input-group">
-  	          <span class="input-group-addon" id="basic-addon1">Document</span>
-  	          <textarea id="customDocument" class="form-control"  placeholder="Document Text" type="textarea" name="customDocument"></textarea>  
-           </div>
-              <button id="btnCustom" data-toggle="tooltip" title="Use this button to add a custom document." type="submit" value="Custom" class="form-control btn btn-default">
-                <span id="spinner"class="hidden glyphicon glyphicon-refresh spinning"></span> Custom Add
-              </button>
-        </form>
-        
-    </div>
+        </div>
     <br>
       $if status == 'success':
           <div class="alert alert-success" role="alert">
@@ -193,3 +192,38 @@ $def with (message, status, logged, user, result, count, instances, selected)
   </div>
 </body>
 </html>
+<script>
+  tinymce.init({
+    selector: '#customDocument',
+    toolbar: 'fontselect',
+    font_formats: 'Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;AkrutiKndPadmini=Akpdmi-n',
+     plugins: [
+        "advlist autolink lists link image charmap print preview anchor",
+        "searchreplace visualblocks code fullscreen",
+        "paste",
+        "insertdatetime media table contextmenu paste imagetools"
+    ]
+  });
+  </script>
+  <script type="text/javascript">
+
+                                jQuery(document).ready(function() {
+                                jQuery("#btnCustom").click(function() {
+                                        var input_string = $$("#customTitle").val();
+                                        var input_string1 = $$("#customDocument").val();
+                                        alert($$("#customDocument").val())
+                                        jQuery.ajax({
+                                                type: "POST",
+                                                url: '/custom',
+                                                data: {customTitle : input_string, customDocument: input_string1},
+                                                success: function(data) {
+                                                $$("#customTitle").val(input_string1);
+                                                document.open();
+                                                document.write(data);
+                                                document.close();
+                                                },
+                                                });
+                                        return false;
+                                        });
+                                });
+</script>

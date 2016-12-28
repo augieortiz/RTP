@@ -1,5 +1,40 @@
 $( document ).ready(function() {
 
+    var success = $('#successNotify').text();
+    if(success.includes("presentation"))
+    {
+
+        $.notify({
+            // options
+            message: success
+        },{
+            // settings
+            type: 'success',
+            placement: {
+                from: "bottom",
+                align: "right"
+            },
+        });
+    }
+    if(success.includes("Try again"))
+    {
+
+        $.notify({
+            // options
+            message: success
+        },{
+            // settings
+            type: 'danger',
+            placement: {
+                from: "bottom",
+                align: "right"
+            },
+        });
+    }
+
+    
+
+         
     if(localStorage.getItem("voice") == "on")
     {
         startSpeech();
@@ -40,7 +75,7 @@ function startSpeech (){
     recognition.onstart = function() {
     //Listening (capturing voice from audio input) started.
     //This is a good place to give the user visual feedback about that (i.e. flash a red light, etc.)
-
+          $("#mic").animate({color:'red'},1000);
          $('#mic').toggleClass("animated infinite pulse",function(){
                $(this).remove();
                if (typeof(Storage) !== "undefined") 
@@ -51,10 +86,11 @@ function startSpeech (){
 	};
 
     recognition.onerror = function(event) {
-        alert("The Listener has stopped.");
+         $("#mic").animate({color:'red'},1000);
          $('#mic').toggleClass("animated infinite pulse",function(){
                $(this).remove();
            });
+         startSpeech();
     }
 
 	recognition.onresult = function(event) { //the event holds the results

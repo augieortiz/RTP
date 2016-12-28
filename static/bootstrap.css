@@ -6960,7 +6960,7 @@ a.list-group-item-danger.active:focus {
 }
 
 .mic {
-  color: red;
+  color: black;
 }
 
 
@@ -6978,4 +6978,15 @@ a.list-group-item-danger.active:focus {
   -vendor-animation-duration: 3s;
   -vendor-animation-delay: 1s;
 }
+}
+
+.links a {
+
+    color:#fff;
+  
+}
+
+.foot {
+  background: #bb0000;
+  color: #fff;
 }

@@ -2,7 +2,7 @@ $def with (message, convo, url, status, logged, user, data, instance)
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>DevAO - RTP Add Data</title>
+    <title>DevAO - RTP Receive Data</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="static/bootstrap.css">
@@ -13,7 +13,9 @@ $def with (message, convo, url, status, logged, user, data, instance)
     <link rel="stylesheet" href="static/font-awesome.css">
     <link rel="stylesheet" href="static/animate.css">
     <link rel='shortcut icon' href='static/favicon.ico'>
+    
     <script src="static/sorttable.js"></script>
+    <script src="static/bootstrap-notify.min.js"></script>
     <script src="static/receive.js"></script>
 </head>
 <body>
@@ -49,7 +51,7 @@ $def with (message, convo, url, status, logged, user, data, instance)
        <div class="col-sm-6">
             <div class="text-center">
               <span id="mic" class="fa-stack fa-2x">
-              <i id ="mic" class="fa fa-circle-thin fa-stack-2x"></i>
+              <i id ="circle" class="fa fa-circle-thin fa-stack-2x"></i>
               <i id="mic" class="mic fa fa-microphone fa-1x" aria-hidden="true"></i>
           </span>
            <h4><span style="color: #b00"><strong>$instance</strong></span></h4>
@@ -59,6 +61,16 @@ $def with (message, convo, url, status, logged, user, data, instance)
       		<button id="find" class="btn btn-default form-control" type="submit" value="Find Presentation Data"> Find Presentation Data </button>
       		</form>
       		<br>
+             $if status == 'success':
+              <h2>Query Search: $convo</h2>
+              <div hidden class="alert alert-success" role="alert">
+                <a id="successNotify"  href="#" class="alert-link">$message has been chosen as the presentation data.</a>
+              </div>
+            $if status == 'error':
+              <h2>Query Search: $convo</h2>
+              <div hidden id="messageAlert"class="alert alert-danger" role="alert">
+                  <a id="successNotify" href="#" class="alert-link">$message</a>
+              </div>
              <div class="panel panel-default">
               <a href="/results"><div class="panel-heading" style="color: white; background-color: #b00">Search Results Table</div></a>
               <div class="table-responsive">
@@ -94,15 +106,7 @@ $def with (message, convo, url, status, logged, user, data, instance)
               </div>
             </div>
           <div class="col-sm-6">
-          $if status == 'success':
-            <h2>Query Search: $convo</h2>
-            <div class="alert alert-success" role="alert">
-                <a href="#" class="alert-link">$message has been chosen as the presentation data.</a>
-            </div>
-          $if status == 'error':
-            <div class="alert alert-danger" role="alert">
-                <a href="#" class="alert-link">$message</a>
-            </div>
+          
           <iframe class="animated slideInRight" id="frameDemo" name="frameDemo" src="$url" style="border: none; width: 100%; height: 100vh "> </iframe>
           </div>
         </div>
@@ -133,4 +137,39 @@ sorttable.makeSortable(newTableObject);
 
 
  </script>
+  <script type="text/javascript">
+
+
+                                jQuery(document).ready(function() {
+
+
+
+                                jQuery("#find").click(function() {
+                                	var conversation = document.forms["convoForm"]["conversation"].value;
+									if (conversation == '' )
+									{
+									alert("You have not entered anything!");
+									return false;
+									} 
+									else {
+										var input_string = $$("#convo").val();
+                                        jQuery.ajax({
+                                                type: "POST",
+                                                data: {conversation : input_string},
+                                                success: function(data) {
+                                                document.open();
+                                                document.write(data);
+                                                document.close();
+                                                },
+                                                });
+
+                                        return false;
+									}
+                                        
+                                        });
+
+							
+                                });
+
+</script>
 
