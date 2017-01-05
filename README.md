@@ -1,6 +1,11 @@
 #researchDevAO - RTP 
 
-##Curent Version - v1.5.2.2
+
+##Current Version Beta - v1.6
+
+Landing page made to look more professional.  All mentions of instances were replaced with presentations to make the application easier to understand for the user.  1 bug fixed in the microphone and stop button.  The SpeechRecognitionAPI javascript code is more functional inside the chrome browser.  This would be our first release, but there is no way for users to create accounts so this version is still in Beta.  Lastly we added the capability onto the landing page to request an account which sends an email to the developer.  This is a quick solution until the developer has more time to make a create account page/section.
+
+##Beta - v1.5.2.2
 
 A proof of concept for the research being done at The Ohio State University by Agustin Ortiz advised by Rajiv Ramnanth
 ##Real Time Presentation API
