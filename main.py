@@ -17,9 +17,10 @@ import hashlib
 from rake import *
 import urlparse
 import urllib
+import smtplib
 from bson.objectid import ObjectId
 
-_version = '4.5.2.2'
+_version = 'Beta 1.6'
 
 urls = (
 	   '/', 'index',
@@ -53,14 +54,37 @@ class index:
 			root = os.path.dirname(__file__) 
 			render = web.template.render("/var/www/RTP/templates/")
 			if logged():
-				return render.index("True", session.user)
+				return render.index("True", session.user, _version)
 			else:
-				return render.index("False", session.user)
+				return render.index("False", session.user, _version)
 	def POST(self):
-		name, email = web.input().email, web.input().name
-		web.config.smtp_server = 'mail.devao.me'
-		web.sendmail('research@devao.me',"augie@devao.me", 'Access Request', name + " " + email)
-		return "Test email"
+		name, email = web.input().name, web.input().email
+		sender = 'research@test.research.me'
+		receivers = ['augie@devao.me']
+
+		message = """From: Research Request <research@research.devao.me>
+Subject: Access Request
+
+This is a request from the RTP application for a new user account.  Below is the information submitted.
+
+Name: %s
+Email: %s
+
+
+Request statuses is completely up to the discretion the research team.
+
+Thanks,
+researchDevAO
+"""
+		render = web.template.render("/var/www/RTP/templates/")
+		try:
+		   smtpObj = smtplib.SMTP('localhost')
+		   smtpObj.sendmail(sender, receivers, message % (name, email))         
+		   return "Successfully sent email"
+
+		except SMTPException:
+		   return "Error: unable to send email"
+
 class thesis:
 	def GET(self):
 			render = web.template.render("/var/www/RTP/templates/")
@@ -96,7 +120,7 @@ class login:
 					instances = getInstances()
 					session.instanceList = instances
 					if session.customID == '':
-						return render.index('True', session.user)
+						return render.index('True', session.user, _version)
 					else: 
 						raise web.seeother('/custom?_id=' + session.customID)
 				else:
@@ -148,7 +172,12 @@ class results:
 		myvar = dict(session=session.session_id)
 		results = db.select('SearchResults', myvar, where="session_id=$session")
 		render = web.template.render("/var/www/RTP/templates/")
-		return render.results(results)
+
+		if logged():
+			return render.results(results, "True", session.user)
+		else:
+			return render.login("warning", "You must login before view results.", _version)
+
 class documentd:
 	def POST(self):
 

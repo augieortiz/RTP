@@ -11,8 +11,8 @@ $( document ).ready(function() {
             // settings
             type: 'success',
             placement: {
-                from: "bottom",
-                align: "right"
+                from: "top",
+                align: "center"
             },
         });
     }
@@ -26,96 +26,137 @@ $( document ).ready(function() {
             // settings
             type: 'danger',
             placement: {
-                from: "bottom",
-                align: "right"
+                from: "top",
+                align: "center"
             },
         });
     }
 
     
+    //
+    // Speech Recognition Methods
+    //
 
-         
-    if(localStorage.getItem("voice") == "on")
+    //
+    // Check local storage for the correct UI output
+    //
+
+    window.onload = function() {
+      if(sessionStorage.status == "ON")
     {
-        startSpeech();
+        $('#miced').removeClass("fa-microphone");
+        $('#miced').addClass("fa-stop animated infinite pulse");
+    }
+    else if(sessionStorage.status == "OFF")
+    {
+        $('#miced').removeClass("fa-stop animated infinite pulse");
+        $('#miced').addClass("fa-microphone");
+    }
+    else
+    {
+        $('#miced').removeClass("fa-stop animated infinite pulse");
+        $('#miced').addClass("fa-microphone");
     }
 
+};
 
-    $('#mic').click(function(){
-        if (typeof(Storage) !== "undefined") {
-        if(localStorage.getItem("voice") == "on")
-        {
-           localStorage.setItem("voice", "off");
-            $('#mic').toggleClass("animated infinite pulse",function(){
-               $(this).remove();
-               });  
-        }
-        else
-        {
-        localStorage.setItem("voice", "on"); 
-      	startSpeech();
-      }
-      }
-        });       
-});
-
-function startSpeech (){
-	if (!('webkitSpeechRecognition' in window)) {
-		alert("Speech recognition not available on this browser. Please choose another.")
-                 $('#mic').removeClass("animated infinite pulse");
-    //Speech API not supported here…
-} else { //Let’s do some cool stuff :)
-    var recognition = new webkitSpeechRecognition(); //That is the object that will manage our whole recognition process. 
+if (!('webkitSpeechRecognition' in window)) {
+            $('#mic').remove(); }
+else
+{
+    var recognition = new webkitSpeechRecognition();
+    var recognizing; //That is the object that will manage our whole recognition process. 
     recognition.continuous = true;   //Suitable for dictation. 
     recognition.interimResults = true;  //If we want to start receiving results even if they are not final.
     //Define some more additional parameters for the recognition:
     recognition.lang = "en-US"; 
-    recognition.maxAlternatives = 1; //Since from our experience, the highest result is really the best...
-    recognition.start();
-    recognition.onstart = function() {
-    //Listening (capturing voice from audio input) started.
-    //This is a good place to give the user visual feedback about that (i.e. flash a red light, etc.)
-          $("#mic").animate({color:'red'},1000);
-         $('#mic').toggleClass("animated infinite pulse",function(){
-               $(this).remove();
-               if (typeof(Storage) !== "undefined") 
-               {
-                    localStorage.setItem("voice", "off");
-                }
-            });
-	};
+    recognition.maxAlternatives = 1;    
+    reset();
 
-    recognition.onerror = function(event) {
-         $("#mic").animate({color:'red'},1000);
-         $('#mic').toggleClass("animated infinite pulse",function(){
-               $(this).remove();
-           });
-         startSpeech();
-    }
+    $('#mic').click(function(){
+		
+		toggleStartStop();
 
-	recognition.onresult = function(event) { //the event holds the results
-	//Yay – we have results! Let’s check if they are defined and if final or not:
-    if (typeof(event.results) === 'undefined') { //Something is wrong…
-        recognition.stop();
-        alert("This app has stopped listening.");
-        $('#mic').removeClass("animated infinite pulse");
-        return;
-    }
-    var text = []
-    for (var i = event.resultIndex; i < event.results.length; ++i) {      
-        if (event.results[i].isFinal) { //Final results
-            console.log("final results: " + event.results[i][0].transcript);
-            	$('#convo').val(event.results[i][0].transcript);
-            	$("#find").trigger("click").delay(2000);
+        });
 
-        } else {   //i.e. interim...
-            console.log("interim results: " + event.results[i][0].transcript);
-            $('#convo').text(event.results[i][0].transcript);  //You can use these results to give the user near real time experience.
-        } 
-    } //end for loop
+    //Stop function
+}
+
+    function reset() {
+	recognizing = false;
+	$('#miced').removeClass("fa-stop animated infinite pulse");
+	$('#miced').addClass("fa-microphone");
+	
+}
+
+function toggleStartStop()
+{
+	if(recognizing)
+	{
+		sessionStorage.status = "OFF";
+		recognition.stop();
+		$('#convo').val("");
+		reset();
+	}
+	else
+	{
+		if (!('webkitSpeechRecognition' in window)) {
+			alert("Speech recognition not available on this browser. Please choose another.")
+    	//Speech API not supported here…
+		} else { //Let’s do some cool stuff :)
+		    //Since from our experience, the highest result is really the best...
+		    recognition.start();
+		    recognizing = true;
+		    sessionStorage.status = "ON";
+	        $('#miced').removeClass("fa-microphone");
+			$('#miced').addClass("fa-stop animated infinite pulse");
+		    recognition.onstart = function() {
+		    //Listening (capturing voice from audio input) started.
+		    //This is a good place to give the user visual feedback about that (i.e. flash a red light, etc.)
+
+		 
+		        
+			};
+
+		    recognition.onerror = function(event) {
+		         recognition.start();
+                recognizing = true;
+                sessionStorage.status = "ON";
+                $('#miced').removeClass("fa-microphone");
+                $('#miced').addClass("fa-stop animated infinite pulse");
+		    }
+
+			recognition.onresult = function(event) { //the event holds the results
+			//Yay – we have results! Let’s check if they are defined and if final or not:
+		    if (typeof(event.results) === 'undefined') { //Something is wrong…
+		        recognition.stop();
+		        alert("This app has stopped listening.");
+		        return;
+		    }
+		    var text = []
+		    for (var i = event.resultIndex; i < event.results.length; ++i) {      
+		        if (event.results[i].isFinal) { //Final results
+		            console.log("final results: " + event.results[i][0].transcript);
+		            	$('#convo').val(event.results[i][0].transcript);
+		            	$("#find").trigger("click").delay(2000);
+
+		        } else {   //i.e. interim...
+		            console.log("interim results: " + event.results[i][0].transcript);
+		            $('#convo').text(event.results[i][0].transcript);  //You can use these results to give the user near real time experience.
+		        } 
+		    } //end for loop
+
+
 }; 
 
 
 }
-
+		
+		
+	}
 }
+
+
+
+});
+

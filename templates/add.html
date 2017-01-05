@@ -45,7 +45,7 @@ $def with (message, status, logged, user, result, count, instances, selected)
       <div class="row" style="height: 100%;">
         <div class="col-sm-6">
         <h3>Add new URL</h3>
-        <label for="sel1">Select Instance:</label>
+        <label for="sel1">Select Presentation:</label>
         <div class="row">
             <div class="col-md-9">
            <form method="POST" action="instancec">
@@ -64,10 +64,8 @@ $def with (message, status, logged, user, result, count, instances, selected)
                     Action <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu">
-                    <li><a data-toggle='modal' data-target="#addInstance" href="#">Add New Instance</a></li>
-                    <li id="deleteButton"><a data-toggle='modal' data-target="#confirm-delete" href="#">Delete Instance</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a href="#">Help</a></li>
+                    <li><a data-toggle='modal' data-target="#addInstance" href="#">Add New Presentation</a></li>
+                    <li id="deleteButton"><a data-toggle='modal' data-target="#confirm-delete" href="#">Delete Presentation</a></li>
                   </ul>
                 </div>
           </div>
@@ -77,12 +75,12 @@ $def with (message, status, logged, user, result, count, instances, selected)
                 <div class="modal-content">
                     <div class="modal-header">
                       <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      <h4 class="modal-title">Add New Instance</h4>
+                      <h4 class="modal-title">Add New Presentation</h4>
                     </div>
                     <form method="POST" action="instance">
                       <div class="modal-body">
                           <div class="input-group">
-                              <span class="input-group-addon" id="basic-addon1">New Instance Name</span>
+                              <span class="input-group-addon" id="basic-addon1">New Presentation Name</span>
                               <input name="newInstance" type="text" class="form-control" placeholder="Instance Name" aria-describedby="basic-addon1">
                           </div>
                       </div>
@@ -97,7 +95,7 @@ $def with (message, status, logged, user, result, count, instances, selected)
         <div class="modal-dialog">
           <div class="modal-content">
               <div class="modal-header">
-                  Confirm Instance Deletion            </div>
+                  Confirm Presentation Deletion            </div>
               <form method="POST" action="instanced">
                 <div class="modal-body">
                 This will delete the instance, <strong><span style="color: red;" id="SI"/></strong> and all it's associated data.
@@ -113,13 +111,13 @@ $def with (message, status, logged, user, result, count, instances, selected)
   </div>
     <br>
     <div>
-      <form name="addCustomURL" id="addCustomURL" method="post" action="custom"  >
+      <form name="addCustomURL" id="addCustomURL"  >
           <div class="input-group">
           <span class="input-group-addon" id="basic-addon1">Slide</span>
               <input id="customTitle" class="form-control"  placeholder="Enter Title" type="text" name="customTitle" />
               <textarea id="customDocument" class="form-control"  placeholder="Document Text" type="textarea" name="customDocument"></textarea>  
-              <button id="btnCustom" data-toggle="tooltip" title="Use this button to add a custom document." type="submit" value="Custom" class="form-control btn btn-default">
-                <span id="spinner"class="hidden glyphicon glyphicon-refresh spinning"></span> Custom Add
+              <button id="btnCustom" data-toggle="tooltip" title="Use this button to add a custom document." type="button" value="Custom" class="form-control btn btn-default">
+                <span id="spinner" class="hidden glyphicon glyphicon-refresh spinning"></span> Custom Add
               </button>
            </div>
               
@@ -160,7 +158,7 @@ $def with (message, status, logged, user, result, count, instances, selected)
       <div class="col-sm-6">
       <h3>Documents</h3>
         <div class="panel panel-default">
-        <div class="panel-heading">Current Instance Database Collection: $count documents </div>
+        <div class="panel-heading">Current Presentation Database Collection: $count documents </div>
           <table class="table table-hover">
             <tbody>
             $if result != 'Empty':
@@ -210,14 +208,25 @@ $def with (message, status, logged, user, result, count, instances, selected)
                                 jQuery(document).ready(function() {
                                 jQuery("#btnCustom").click(function() {
                                         var input_string = $$("#customTitle").val();
-                                        var input_string1 = $$("#customDocument").val();
-                                        alert($$("#customDocument").val())
+                                        var input_string1 = window.parent.tinymce.get('customDocument').getContent();
+
+                                        if(input_string == '')
+                                        {
+                                          alert("A title has not been entered in the slide.");
+                                          return false;
+                                        }
+
+                                        if(input_string1 == '')
+                                        {
+                                          alert("There is no data in the slide.  Please enter data.");
+                                          return fasle;;
+                                        }
+
                                         jQuery.ajax({
                                                 type: "POST",
                                                 url: '/custom',
                                                 data: {customTitle : input_string, customDocument: input_string1},
                                                 success: function(data) {
-                                                $$("#customTitle").val(input_string1);
                                                 document.open();
                                                 document.write(data);
                                                 document.close();

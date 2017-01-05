@@ -1,4 +1,4 @@
-$def with (result)
+$def with (result, logged, user)
 <html lang="en">
 <head>
   <title>DevAO - RTP Results</title>
@@ -35,6 +35,13 @@ $def with (result)
                         <li class="active"><a href="/results">Test Results</a></li>
                         <li><a href="/thesis">Thesis</a></li>
                     </ul>
+                    <ul class="nav navbar-nav navbar-right animated fadeInDown">
+                        $if logged == 'True':
+                            <li><a href="#">Welcome, <strong>$user</strong></a></li>
+                            <li><a href="/logout">Log Out</a></li>
+                        $if logged == 'False':
+                            <li><a href="/login">Login</a></li>
+                    </ul>
                 </div>
             </div>
   </nav>
@@ -45,7 +52,7 @@ $def with (result)
                     <thead>
                       <tr>
                         <th>#</th>
-                        <th>Instance</th>
+                        <th>Presentation</th>
                         <th>Search Query</th>
                         <th>Document Title</th>
                         <th>Score</th>

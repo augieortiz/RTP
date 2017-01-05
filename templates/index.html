@@ -1,4 +1,4 @@
-$def with (logged, user)
+$def with (logged, user, version)
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -13,6 +13,8 @@ $def with (logged, user)
         <link rel="stylesheet" href="static/bootstrap.css" type="text/css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
         <link href="static/favicon.ico" rel="icon" type="image/x-icon" />
+        <script src="static/bootstrap-notify.min.js"></script>
+        <script src="static/wow.min.js"></script>
     </head>
     <body>
         <nav class="navbar navbar-inverse">
@@ -44,32 +46,33 @@ $def with (logged, user)
         </nav>
         <div class="container animated fadeIn">
          <!-- Heading Row -->
-            <div class="row">
+            <div class="row wow fadeIn">
                 <div class="col-md-8">
                     <img class="img-responsive img-rounded" src="static/header.png" alt="">
                 </div>
                 <!-- /.col-md-8 -->
                 <div class="col-md-4">
-                    <h1>Real Time Presentation</h1>
+                    <h1 style="font-weight: bolder;">Real Time Presentation</h1>
                     <p>RTP is currently in Beta phase.  It is closed for testing but new users can request access here:</p>
-                    <form method="POST" action="">
-                              <input name="name" type="text" class="form-control" placeholder="Name" aria-describedby="basic-addon1">
-                              <input name="email" type="text" class="form-control" placeholder="Email" aria-describedby="basic-addon1">\
-                              <button style="width: 100%;" class="btn btn-default btn" type="submit">Request</button>
+                    <form method="POST" action="\   ">
+                              <input required id="name" name="name" type="text" class="form-control" placeholder="Name" aria-describedby="basic-addon1">
+                              <input required id="email" name="email" type="email" class="form-control" placeholder="Email" aria-describedby="basic-addon1">\
+                              <button id="btnRequest" style="width: 100%;" class="btn btn-default btn" type="submit">Request</button>
+                          </form>
                 </div>
                 <!-- /.col-md-4 -->
             </div>
             <!-- /.row -->
 
-        <hr>
+            <hr>
             <!-- /.row -->
-            <div class="row">
+            <div class="row wow fadeIn">
             <div class="col-sm-8">
-                <h2>What We Do</h2>
+                <h2>About RTP</h2>
                 <p>The purpose of the software tool is to allow a user to pull up the most relevant piece of document data based on surrounding conversation data happening at a given moment. This gives users an opportunity to store web pages as document data, and retrieve those web pages based on some text interpreted as a conversation. The relevance of the document retrieval methods are being researched, validated, and tested by Agustin Ortiz.</p>
-                <p>
-                    <a class="btn btn-default btn" href="/login">Login</a>
-                </p>
+
+                $if logged != 'True':
+	                <p><a class="btn btn-default btn" href="/login">Login</a></p>
             </div>
             <div class="col-sm-4">
                 <h2>Contact Us</h2>
@@ -79,16 +82,16 @@ $def with (logged, user)
                 </address>
                 <address>
 
-                    <abbr title="Phone">P:</abbr> (907) 854-3164
+                    <abbr title="Phone">Phone:</abbr> (907) 854-3164
                     <br>
-                    <abbr title="Email">E: </abbr> <a href="mailto:#">augie@devao.me</a>
+                    <abbr title="Email">Email: </abbr> <a href="mailto:#">augie@devao.me</a>
                 </address>
             </div>
         </div>
-        <hr>
+    
             <!-- Content Row -->
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-4 wow fadeIn" data-wow-delay=".35s">
                    <div class="text-center">
                    <span class="fa-stack fa-4x">
                         <i class="fa fa-circle fa-stack-2x" style="color: #bb0000"></i>
@@ -99,7 +102,7 @@ $def with (logged, user)
                     <p>Add rich data including pictures to your instances or add custom urls.  Adding data is similar to adding slides to a powerpoint presentation.</p>
                 </div>
                 <!-- /.col-md-4 -->
-                <div class="col-md-4">
+                <div class="col-md-4 wow fadeIn" data-wow-delay=".35s">
                     <div class="text-center">
                          <span class="fa-stack fa-4x">
                         <i class="fa fa-circle fa-stack-2x" style="color: #bb0000"></i>
@@ -110,7 +113,7 @@ $def with (logged, user)
                     <p>The application picks up surrounding conversation through the listening device and will present data based on the live conversation. <small style="color: #bb0000">*Chrome browser required</small></p>
                 </div>
                 <!-- /.col-md-4 -->
-                <div class="col-md-4">
+                <div class="col-md-4 wow fadeIn" data-wow-delay=".35s">
                     <div class="text-center">
                          <span class="fa-stack fa-4x">
                         <i class="fa fa-circle fa-stack-2x" style="color: #bb0000"></i>
@@ -122,51 +125,135 @@ $def with (logged, user)
                     <p>The paper written my Agustin Ortiz III for his CSE MS includes how this app was build and everything involved surrounding the idea.</p>
                 </div>
             </div>
-      
-          <div class="row">
-            <div class="col-lg-12">
-                <h2 class="page-header">Application Details</h2>
+            <hr>
+          <!-- About Section -->
+    <section id="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center wow">
+                    <h2 class="section-heading">RTP Process</h2>
+                    <h3 class="section-subheading text-muted">Steps to using the application.</h3>
+                </div>
             </div>
-            <div class="col-md-6">
-                <p>The RTP was created using the following tools:</p>
-                <ul>
-                    <li><strong>Web.Py</strong>
-                    </li>
-                    <li>MongoDB & MySQL </li>
-                    <li>JQuery & Bootstrap</li>
-                    <li>Rake Algorthim</li>
-                    <li>Animate.css, Sortable.js, & DataTables </li>
-                    <li>Amazon Web Services for hosting and domian administration</li>
-                </ul>
-                <p>This app</p>
-            </div>
-            <div class="col-md-6">
-                <img class="img-responsive" src="http://placehold.it/700x450" alt="">
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="timeline">
+                        <li class="wow fadeIn">
+                            <div class="timeline-image">
+                               <img class="img-circle img-responsive" src="static/present.png" alt="">
+                            </div>
+                            <div class="timeline-panel">
+                                <div class="timeline-heading">
+                                    <h4>Step 1</h4>
+                                    <h4 class="subheading">Create Presentation</h4>
+                                </div>
+                                <div class="timeline-body">
+                                    <p class="text-muted">You can create a presentation just like power point with either web pages or custom designs.  Go to the add tab and select new presentation</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="timeline-inverted wow fadeIn">
+                            <div class="timeline-image">
+                                <img class="img-circle img-responsive" src="static/adddata.png" alt="">
+                            </div>
+                            <div class="timeline-panel">
+                                <div class="timeline-heading">
+                                    <h4>Step 2</h4>
+                                    <h4 class="subheading">Add data</h4>
+                                </div>
+                                <div class="timeline-body">
+                                    <p class="text-muted">There are three ways to add data: Web pages, Spider add a group of a web pages, and a customized rich text field which works similar to power point.</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="timeline-image  wow fadeIn">
+                                <img class="img-circle img-responsive" src="static/start.png" alt="">
+                            </div>
+                            <div class="timeline-panel">
+                                <div class="timeline-heading">
+                                    <h4>Step 3</h4>
+                                    <h4 class="subheading">Start the Presentation</h4>
+                                </div>
+                                <div class="timeline-body">
+                                    <p class="text-muted">The receive tab will start your presentation automatically.  If you are a chrome user, the microphone will pick up any surrounding conversation.  Otherwise, you can simply type in your queries into the text area.</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="timeline-inverted  wow fadeIn">
+                            <div class="timeline-image">
+                                <img class="img-circle img-responsive" src="static/search.png" alt="">
+                            </div>
+                            <div class="timeline-panel">
+                                <div class="timeline-heading">
+                                    <h4>Step 4</h4>
+                                    <h4 class="subheading">Algorithm & Data Retrieval</h4>
+                                </div>
+                                <div class="timeline-body">
+                                    <p class="text-muted">The application will take the submitted data and run it through a complicated algorithm to retrieve the most relevant piece of presentation data.  The help of MongoDB's text score will be shown in the table below the text area.</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="timeline-inverted wow fadeIn">
+                            <div class="timeline-image">
+                                <h4><strong>Data 
+                                    <br>Presented!</strong></h4>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
+    </section>
+  <aside class="tools">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-sm-6">
+                    <a href="#">
+                        <img src="static/mongodb.png" class="img-responsive img-centered" alt="">
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="#">
+                        <img src="static/aws.png" class="img-responsive img-centered" alt="">
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="#">
+                        <img src="static/bootstrap.png" class="img-responsive img-centered" alt="">
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="#">
+                        <img src="static/webpy.png" class="img-responsive img-centered" alt="">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </aside>
 
         <hr>
          <!-- Team Members Row -->
         <div class="row">
             <div class="col-lg-12">
-                <h2 class="page-header">Contributors</h2>
+                <h2 >Contributors</h2>
             </div>
-            <div class="col-lg-4 col-sm-6 text-center">
-                <img style="margin: auto; border: 3px #666 solid" class="img-circle img-responsive img-center" src="static/ao_init.png" alt="">
+            <div class="col-lg-4 col-sm-6 text-center wow fadeIn" data-wow-delay=".35s">
+                <img style="margin: auto; border: 3px #666 solid" class=" img-responsive img-center" src="static/ao_init.png" alt="">
                 <h3>Agustin Ortiz III
                     <small>Lead Researcher</small>
                 </h3>
                 <p>OSU MS Student, GRA</p>
             </div>
-            <div class="col-lg-4 col-sm-6 text-center">
-                <img style="margin: auto; border: 3px #666 solid" class="img-circle img-responsive img-center" src="static/rr_init.png" alt="">
+            <div class="col-lg-4 col-sm-6 text-center wow fadeIn" data-wow-delay=".35s">
+                <img style="margin: auto; border: 3px #666 solid" class=" img-responsive img-center" src="static/rr_init.png" alt="">
                 <h3>Rajiv Ramnath
                     <small>Advisor</small>
                 </h3>
                 <p>OSU CSE Faculty</p>
             </div>
-            <div class="col-lg-4 col-sm-6 text-center">
-                <img style="margin: auto; border: 3px #666 solid" class="img-circle img-responsive img-center" src="static/jk_init.png" alt="">
+            <div class="col-lg-4 col-sm-6 text-center wow fadeIn" data-wow-delay=".35s">
+                <img style="margin: auto; border: 3px #666 solid" class=" img-responsive img-center" src="static/jk_init.png" alt="">
                 <h3>Jithendra Kumar
                     <small>Consultant</small>
                 </h3>
@@ -177,29 +264,79 @@ $def with (logged, user)
         <br>
         <footer>
             <div class="row foot" style="padding-top: 2%;">
-                <div class="col-md-4 text-center">
-                    <img style="margin: auto; width:auto; height: 100px;" class="img-responsive" src="static/DevAOIII_white_FINAL.png" alt="">
+                <div class="col-md-4 text-center ">
+                    <a href="https://devao.me"><img style="margin: auto; width:auto; height: 100px;" class="img-responsive" src="static/DevAOIII_white_FINAL.png" alt=""></a>
                     <p>Designed and Coded by DevAO</p>
                 </div>
                 <div class="col-md-4 text-center">
-                        <i class="fa fa-github" aria-hidden="true" style="font-size: 100px; color: #fff"></i>
-                    <p>All source code on GitHub</p>
+                        <a href="https://github.com/augieortiz/RTP"><i class="fa fa-github" aria-hidden="true" style="font-size: 100px; color: #fff"></i>
+                    <p style="color: #fff"> All source code on GitHub</p></a>
                 </div>
                 <div class="links col-md-4">
                 <h4><strong>Related Links</strong></h4>
-                <p><a href="#"> DevAO </a><p>
-                <p><a href="#"> Ohio State CSE Department </a>
-                <p><a href="#"> Ontoborn </a></p>
+                <p><a href="http://augie.devao.me/"> Agustin Ortiz </a><p>
+                <p><a href="http://web.cse.ohio-state.edu/~ramnath/"> Rajiv Ramnath </a><p>
+                <p><a href="https://cse.osu.edu/"> Ohio State CSE Department </a>
+                <p><a href="http://ontoborn.com/"> Ontoborn </a></p>
                 </div>
+                <p class="text-center"> <small> Hosted by Amazon Web Services | $version | Updated January 2017</small></p>
+                <p class="text-center" style="font-size: .5em">DevAO is not affiliated with The Ohio State University</p>
             </div>
+
         </footer>
 
     </body>
 </html>
-<script>
-// self executing function here
-(function() {
-    var x = new Date(document.lastModified);
-    document.getElementById("last").innerHTML = x;
-})();
+<script type="text/javascript">
+
+                                jQuery(document).ready(function() {
+                                jQuery("#btnRequest").click(function() {
+                                        var input_string = $$("#name").val();
+                                        var input_string1 = $$("#email").val();
+                                        jQuery.ajax({
+                                                type: "POST",
+                                                url: "/",
+                                                data: {name : input_string, email: input_string1},
+                                                success: function(data) {
+                                                
+                                                if(data == "Successfully sent email")
+                                                {
+                                                    $$.notify({
+                                                        // options
+                                                        message: "Successfully submitted. You should hear back soon."
+                                                    },{
+                                                        // settings
+                                                        type: 'success',
+                                                        placement: {
+                                                            from: "top",
+                                                            align: "right"
+                                                        },
+                                                    });
+
+                                                    $$("#btnRequest").prop("disabled",true);
+                                                }
+                                                else
+                                                {
+                                                     $$.notify({
+                                                        // options
+                                                        message: "Something went wrong. Please try again."
+                                                    },{
+                                                        // settings
+                                                        type: 'danger',
+                                                        placement: {
+                                                            from: "top",
+                                                            align: "right"
+                                                        },
+                                                    });
+                                                }
+
+
+                                                },
+                                                });
+                                        return false;
+                                        });
+                                });
+</script>
+ <script>
+    new WOW().init();
 </script>

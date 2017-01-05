@@ -7,13 +7,13 @@ $def with (message, convo, url, status, logged, user, data, instance)
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="static/bootstrap.css">
     <meta charset="utf-8">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js" ></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
     <link rel="stylesheet" href="static/font-awesome.css">
     <link rel="stylesheet" href="static/animate.css">
     <link rel='shortcut icon' href='static/favicon.ico'>
-    
+    <script src="static/wow.min.js"></script>
     <script src="static/sorttable.js"></script>
     <script src="static/bootstrap-notify.min.js"></script>
     <script src="static/receive.js"></script>
@@ -49,14 +49,16 @@ $def with (message, convo, url, status, logged, user, data, instance)
     <div class="container-fluid">
       <div class="row" style="height: 100%;">
        <div class="col-sm-6">
-            <div class="text-center">
+            <div class="text-center wow fadeIn" data-wow-delay="1s">
               <span id="mic" class="fa-stack fa-2x">
               <i id ="circle" class="fa fa-circle-thin fa-stack-2x"></i>
-              <i id="mic" class="mic fa fa-microphone fa-1x" aria-hidden="true"></i>
-          </span>
-           <h4><span style="color: #b00"><strong>$instance</strong></span></h4>
+              <i id="miced" class="mic fa fa-1x" aria-hidden="true"></i>
+              </span>
+              <h4><span style="color: #b00"><strong>$instance</strong></span></h4>
             </div>
-      		<form method="post" name="convoForm" onsubmit=" return validateForm()" action="receive">
+            
+
+      		<form name="convoForm" onsubmit=" return validateForm()" >
       		<textarea id="convo" type="textarea" class="form-control" rows="5" name="conversation"></textarea> 
       		<button id="find" class="btn btn-default form-control" type="submit" value="Find Presentation Data"> Find Presentation Data </button>
       		</form>
@@ -107,7 +109,7 @@ $def with (message, convo, url, status, logged, user, data, instance)
             </div>
           <div class="col-sm-6">
           
-          <iframe class="animated slideInRight" id="frameDemo" name="frameDemo" src="$url" style="border: none; width: 100%; height: 100vh "> </iframe>
+          <iframe class="animated slideInUp" id="frameDemo" name="frameDemo" src="$url" style="border: none; width: 100%; height: 100vh "> </iframe>
           </div>
         </div>
     </div>
@@ -116,31 +118,9 @@ $def with (message, convo, url, status, logged, user, data, instance)
   <div id="#foo"></div>
 </body>
 </html>
-  <script type="text/javascript">
-function validateForm()
-{
+<script type="text/javascript">
 
-  	var conversation = document.forms["convoForm"]["conversation"].value;
-	if (conversation == '' )
-   	{
-   		alert("You have not entered anything!");
-     	return false;
-   	} 
-   	else {
-     	return true;
-   }
-}
-
-
-var newTableObject = document.getElementById("#results")
-sorttable.makeSortable(newTableObject);
-
-
- </script>
-  <script type="text/javascript">
-
-
-                                jQuery(document).ready(function() {
+jQuery(document).ready(function() {
 
 
 
@@ -172,4 +152,6 @@ sorttable.makeSortable(newTableObject);
                                 });
 
 </script>
-
+ <script>
+    new WOW().init();
+</script>
