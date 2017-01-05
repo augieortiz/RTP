@@ -1,11 +1,14 @@
 #researchDevAO - RTP 
 
-##Curent Version - v1.5
+##Curent Version - v1.5.2.2
 
 A proof of concept for the research being done at The Ohio State University by Agustin Ortiz advised by Rajiv Ramnanth
 ##Real Time Presentation API
 The purpose of the software tool is to allow a user to pull up the most relevant piece of document data based on surrounding conversation data happening at a given moment. This gives users an opportunity to store web pages as document data, and retrieve those web pages based on some text interpreted as a conversation. The relevance of the document retrieval methods are being researched, validated, and tested by Agustin Ortiz.
 
+#Beta v1.5.2.2
+
+2 bug fixes & 2 additions dealing with id's on custom document urls.  The urls are no longer used as query strings, rather they are the ObjectID stored in the MongoDB.  Displaying this url provided a few bugs but they have been resolved.  The version number is only on the login page and is now a variable for easier modifications.  We have added the url to the document on the results page for devleoper reference while testing.  Small release but necessary for testing.
 
 #Beta v1.5
 
