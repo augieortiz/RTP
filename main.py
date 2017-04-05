@@ -16,9 +16,18 @@ import lxml.etree
 import hashlib
 from rake import *
 import urlparse
+import logging
 import urllib
 import smtplib
 from bson.objectid import ObjectId
+
+logger = logging.getLogger('myapp')
+hdlr = logging.FileHandler('/var/tmp/myapp.log')
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+hdlr.setFormatter(formatter)
+logger.addHandler(hdlr) 
+logger.setLevel(logging.INFO)
+
 
 _version = 'Beta 1.6'
 
@@ -36,7 +45,8 @@ urls = (
 		'/spider', 'spider',
 		'/custom', 'custom',
 		'/results', 'results',
-		'/welcome', 'welcome'
+		'/welcome', 'welcome',
+		'/presentation', 'presentation'
 )
 web.config.debug = True
 
@@ -96,7 +106,7 @@ class login:
 	def GET(self):
 			if logged():
 				render = web.template.render("/var/www/RTP/templates/")
-				return render.index("already logged in", session.user)
+				return render.index("already logged in", session.user, _version)
 			else:
 				render = web.template.render("/var/www/RTP/templates/")
 				return render.login("", "", _version)
@@ -353,6 +363,7 @@ class custom:
 	def GET(self):
 		data = web.input()
 		if logged():
+
 			client = MongoClient()
 			db = client.RTP
 			docID = data._id
@@ -362,16 +373,18 @@ class custom:
 					newiid = db.RTP.find_one({"_id": ObjectId(session.customID) }, {"instanceID": -1, "_id" : 0})
 					newInstanceSelected = db.Instances.find_one({"username": session.user, "_id" : newiid["instanceID"] }, {"topic": -1})
 					session.instanceSelected = newInstanceSelected['topic']
-			except Exception, e:
-				session.customID = ''
-				return session.customID, session.instanceSelected
+			
 
 			
 
-			iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
-			result = db.RTP.find( {"instanceID" : iid['_id'], "_id": ObjectId(docID)}, {"title": -1, "type": -1, "document": -1, "url": -1})
-			session.customID = ''
-			return render.custom(result[0]['title'], result[0]['document'], session.session_id)
+				iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
+				result = db.RTP.find( {"instanceID" : iid['_id'], "_id": ObjectId(docID)}, {"title": -1, "type": -1, "document": -1, "url": -1})
+				session.customID = ''
+				return render.custom(result[0]['title'], result[0]['document'], session.session_id)
+
+			except Exception, e:
+				session.customID = ''
+				return render.notfound("Something went wrong...");
 			
 		else:
 			session.customID = data._id;
@@ -401,6 +414,14 @@ class welcome:
 	def GET(self):
 		render = web.template.render('/var/www/RTP/templates/')
 		return render.welcome()
+
+class presentation:
+	def GET(self):
+		render = web.template.render("/var/www/RTP/templates/")
+		if logged():
+			return render.presentation("True", session.user, _version)
+		else:
+			return render.login("alert", "This data is sensitive and therefore you must have credentials to view the thesis document.", _version)
 
 def convertArray(data, search):
 	newList = [];
@@ -505,20 +526,31 @@ def searchDatbaseRake(db, keywords):
 	searchData.append([])
 	searchData.append([])
 	keywords = keywords.most_common(25)
+
+	alldata = [];
+	
 	for x in range (0,len(keywords)):
+		count = 0;
 		try:
 			iid = db.Instances.find_one({"username": session.user, "topic" : session.instanceSelected }, {"_id": -1})
 			ident = iid['_id']
 			result = db.RTP.aggregate( [ { "$match": { "$text": { "$search": keywords[x][0] }, "instanceID" : ObjectId(ident) }  },  { "$project": { "url": -1, "title": -1, "document": -1, "_id": -1, "score": { "$meta": "textScore" } } }, { "$match": {  "score": {  "$gt": 1 } } } ])
+			
 		except RuntimeError:
 			print "Search has failed with keywords : " + keywords[x][0] + ". Retrying with next keyword."
+			newTup = (keywords[x][0], 0)
+			alldata.append(newTup)
 		for document in result:
+			count = count + 1
 			searchData[0].append(str(document['url']))
 			searchData[1].append(document['score'])
 			searchData[2].append(keywords[x][0])
 			searchData[3].append(document['title'].encode('ascii', 'ignore'))
 			searchData[4].append((document['document']))
 			searchData[5].append((document['_id']))
+		newTup = (keywords[x][0], count)
+		alldata.append(newTup)
+	logger.info(alldata)
 	if not searchData[0]:
 		print "No results found..."
 		return searchData, 0
@@ -535,6 +567,7 @@ def searchDatbaseRake(db, keywords):
 			searchData = []
 			"Error on results. Retry."
 	return searchData, maxIndex
+
 def txtRake(text):
 
 	# Split text into sentences
@@ -554,6 +587,7 @@ def txtRake(text):
 	if debug: print keywordcandidates
 
 	sortedKeywords = sorted(keywordcandidates.iteritems(), key=operator.itemgetter(1), reverse=True)
+	logger.info(sortedKeywords)
 	if debug: print sortedKeywords
 
 	totalKeywords = len(sortedKeywords)

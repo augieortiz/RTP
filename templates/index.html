@@ -33,6 +33,7 @@ $def with (logged, user, version)
                         <li><a href="/receive">Receive Data</a></li>
                         <li><a href="/results">Test Results</a></li>
                         <li><a href="/thesis">Thesis</a></li>
+                       <li><a href="/presentation">Exam</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right animated fadeInDown">
                         $if logged == 'True':
@@ -91,7 +92,7 @@ $def with (logged, user, version)
     
             <!-- Content Row -->
             <div class="row">
-                <div class="col-md-4 wow fadeIn" data-wow-delay=".35s">
+                <div class="col-md-4 wow fadeIn" data-wow-delay=".35s" href="/add">
                    <div class="text-center">
                    <span class="fa-stack fa-4x">
                         <i class="fa fa-circle fa-stack-2x" style="color: #bb0000"></i>
@@ -102,7 +103,7 @@ $def with (logged, user, version)
                     <p>Add rich data including pictures to your instances or add custom urls.  Adding data is similar to adding slides to a powerpoint presentation.</p>
                 </div>
                 <!-- /.col-md-4 -->
-                <div class="col-md-4 wow fadeIn" data-wow-delay=".35s">
+                <div class="col-md-4 wow fadeIn" data-wow-delay=".35s" href="/receive">
                     <div class="text-center">
                          <span class="fa-stack fa-4x">
                         <i class="fa fa-circle fa-stack-2x" style="color: #bb0000"></i>
@@ -113,7 +114,7 @@ $def with (logged, user, version)
                     <p>The application picks up surrounding conversation through the listening device and will present data based on the live conversation. <small style="color: #bb0000">*Chrome browser required</small></p>
                 </div>
                 <!-- /.col-md-4 -->
-                <div class="col-md-4 wow fadeIn" data-wow-delay=".35s">
+                <div class="col-md-4 wow fadeIn" data-wow-delay=".35s" >
                     <div class="text-center">
                          <span class="fa-stack fa-4x">
                         <i class="fa fa-circle fa-stack-2x" style="color: #bb0000"></i>
@@ -122,7 +123,7 @@ $def with (logged, user, version)
                     <h2>Thesis Paper</h2>
                     </div>
                     
-                    <p>The paper written my Agustin Ortiz III for his CSE MS includes how this app was build and everything involved surrounding the idea.</p>
+                    <p>The paper written my Agustin Ortiz III for his CSE MS includes how this app was built and everything involved surrounding the idea.</p>
                 </div>
             </div>
             <hr>
