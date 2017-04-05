@@ -1,0 +1,52 @@
+$def with (logged, user, version)
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>DevAO - Research Home</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="static/bootstrap.css" type="text/css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="static/animate.css" type="text/css">
+        <link rel="stylesheet" href="static/bootstrap.css" type="text/css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        <link href="static/favicon.ico" rel="icon" type="image/x-icon" />
+        <script src="static/bootstrap-notify.min.js"></script>
+        <script src="static/wow.min.js"></script>
+    </head>
+    <body>
+        <nav class="navbar" style="margin-bottom: 0px; color: #bb0000; text-decoration: none;"">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span> 
+                </button>
+                    <a class="active navbar-brand" href="/"><span style="font-size: 75%">research</span>DevAO</a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav navbar-collapse" style="text-decoration: none">
+                        <li><a href="/add">Add Data</a></li>
+                        <li><a href="/receive">Receive Data</a></li>
+                        <li><a href="/results">Test Results</a></li>
+                        <li><a href="/thesis">Thesis</a></li>
+                        <li><a class="active" href="/presentation">Exam</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right animated fadeInDown">
+                        $if logged == 'True':
+                            <li><a href="#">Welcome, <strong>$user</strong></a></li>
+                            <li><a href="/logout">Log Out</a></li>
+                        $if logged == 'False':
+                            <li><a href="/login">Login</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <iframe width="100%" style  src="https://docs.google.com/presentation/d/1QV1Ni7YiLx_wVRv7pliR3VNKyQqT79aIlePbRHygjis/embed?start=false&loop=false&delayms=3000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+
+    </body>
+</html>
