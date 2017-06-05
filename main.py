@@ -53,7 +53,9 @@ web.config.debug = True
 app = web.application(urls, globals())
 application = app.wsgifunc()
 curdir = os.path.dirname(__file__)
-db = web.database(dbn='mysql', user='root', pw='Augie03!', db='dbRTP')
+password = open("/var/tmp/auth.txt", "r")
+pw = password.read()
+db = web.database(dbn='mysql', user='root', pw=pw , db='dbRTP')
 
 
 store = web.session.DBStore(db, 'sessions')
