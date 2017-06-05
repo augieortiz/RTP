@@ -175,7 +175,7 @@ class receive:
 					present = data[0][index] 
 					return render.receive("We found the presentation data of:  " + data[3][index], search, present, "success", "True", session.user, newdata, session.instanceSelected)
 			except Exception,e:
-				db = web.database(dbn='mysql', user='root', pw='Augie03!', db='dbRTP')
+				db = web.database(dbn='mysql', user='root', pw=pw, db='dbRTP')
 				db.insert('SearchResults', session_id=session.session_id, score="", currentInstance=session.instanceSelected, searchQuery=search, found=0)
 				return render.receive("Looks like you there was no data found...Try again maybe.", search, session.lastVisted, "error", "True", session.user, "notfound", session.instanceSelected)
 
